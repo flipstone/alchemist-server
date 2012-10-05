@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+#
+$LOAD_PATH << "../lib"
+
+require 'bundler'
+Bundler.setup
+require 'readline'
+
+world_file = ARGV.first || "tmp/dev_world.alc"
+
+puts "Using world file: #{world_file}"
+
+loop do
+   line = Readline::readline('> ')
+   break if line.nil? || line == 'quit'
+   Readline::HISTORY.push(line)
+
+   rd, wr = IO.pipe
+
+   if fork
+     wr.close
+     result = rd.read
+     rd.close
+     Process.wait
+
+     puts result
+   else
+     rd.close
+     require 'alchemist-server'
+
+     result = Alchemist::Server.one_shot world_file, line
+
+     wr.write result
+     wr.flush
+     wr.close
+     exit! 0
+   end
+end
+
+puts
+
