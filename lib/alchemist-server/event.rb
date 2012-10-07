@@ -1,5 +1,7 @@
 module Alchemist
   class Event
+    attr_reader :new_world
+
     def initialize(command, new_world, time)
       @command = command
       @new_world = new_world

@@ -5,8 +5,12 @@ module Alchemist
       @prior_history = prior_history
     end
 
+    def world
+      @event.new_world
+    end
+
     def to_s
-      <<-str
+      <<-str.strip
 #{@event}
 #{@prior_history}
       str
