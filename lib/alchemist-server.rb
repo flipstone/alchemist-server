@@ -4,43 +4,61 @@ require "hamster"
 require "alchemist-server/version"
 
 require "alchemist-server/avatar"
+require "alchemist-server/commands/appear"
+require "alchemist-server/commands/generate"
+require "alchemist-server/commands/south"
+require "alchemist-server/direction"
 require "alchemist-server/event"
 require "alchemist-server/world"
 require "alchemist-server/world_history"
+
+class Object
+  def try(sym, *args)
+    send sym, *args
+  end
+end
+
+class NilClass
+  def try(*args)
+
+  end
+end
 
 module Alchemist
   module Server
     def self.one_shot(world_file, command_string)
       command, *args = command_string.split /\s+/
 
-      case command
-      when /^gen(erate)?$/
-        history = load_history world_file
-        new_world, response = generate *args.map(&:to_i)
-        event = Event.new command_string, new_world, Time.now
-        new_history = WorldHistory.new event, history
+      if command_mod = COMMANDS.detect { |c| match_command? command, c }
+        run_command_module command_string, world_file, command_mod, *args
+      else
+        run_special_command world_file, command, *args
+      end
+    end
 
-        File.open(world_file,'w') do |f|
-          f.write new_history.to_s
-        end
+    def self.run_command_module(command_string, world_file, command_mod, *args)
+      history = load_history world_file
+      response, new_world = command_mod.run history, *args
+      event = Event.new command_string, new_world, Time.now
+      new_history = WorldHistory.new event, history
 
-        response
-      when /^app(ear)?$/
-        history = load_history world_file
-        new_world, response = appear history.world, *args
-        event = Event.new command_string, new_world, Time.now
-        new_history = WorldHistory.new event, history
+      File.open(world_file,'w') do |f|
+        f.write new_history.to_s
+      end
 
-        File.open(world_file,'w') do |f|
-          f.write new_history.to_s
-        end
+      response
+    end
 
-        response
+    def self.run_special_command(world_file, command_string, *args)
+      case command_string
       when /^show_raw_file$/
-        _, response = show_raw_file world_file
-        response
+        File.read(world_file)
       when /^show_history$/
         load_history(world_file).to_s
+      when /^loc(ation)?$/
+        load_history(world_file).world.location(*args).to_s
+      when /^dim(ensions)?$/
+        load_history(world_file).world.dimensions(*args).to_s
       else
         "Unknown Command: #{command}"
       end
@@ -54,28 +72,15 @@ module Alchemist
       end
     end
 
-    def self.show_raw_file(world_file)
-      return nil, File.read(world_file)
+    def self.match_command?(command_name, command)
+      command_name =~ /^#{command.pattern}/
     end
-
-    def self.generate(x, y)
-      w = World.new [], y.times.map { ee(x) }.join("\n")
-      return w, w.geography
-    end
-
-    def self.appear(world, avatar_name)
-      return world.new_avatar(avatar_name), "Greetings, #{avatar_name}."
-    end
-
-    def self.ee(n)
-      n.times.map {e}.join ''
-    end
-
-    def self.e
-      INITIAL_ELEMENTS.shuffle.first
-    end
-
-    INITIAL_ELEMENTS = %w(^ ~ -)
   end
+
+  COMMANDS = [
+    Commands::Appear,
+    Commands::Generate,
+    Commands::South
+  ]
 end
 
