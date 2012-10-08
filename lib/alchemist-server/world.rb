@@ -21,6 +21,24 @@ module Alchemist
       @avatars.detect { |a| a == locator }
     end
 
+    def at(avatar_name)
+      a = avatar(avatar_name)
+      return unless a
+      @geography.at a.x, a.y
+    end
+
+    def take(avatar_name)
+      a = avatar(avatar_name)
+      return self unless a
+
+      resource = geography.at a.x, a.y
+      new_a = a.add_to_inventory resource
+      new_g = geography.take a.x, a.y
+
+      World.new @avatars - [a] + [new_a],
+                new_g
+    end
+
     def move(avatar_name, direction)
       a = avatar(avatar_name)
       return self unless a
@@ -38,8 +56,7 @@ module Alchemist
     end
 
     def dimensions
-      lines = geography.lines.map(&:chomp)
-      [lines.first.length, lines.length]
+      @geography.dimensions
     end
 
     def self.parse(string)
@@ -47,7 +64,8 @@ module Alchemist
                 .map { |l| Avatar.parse l }
                 .take_while { |a| a }
 
-      new avatars.to_set, string.lines.drop(avatars.length).join('')
+      geo = Geography.new string.lines.drop(avatars.length).join('')
+      new avatars.to_set, geo
     end
   end
 end

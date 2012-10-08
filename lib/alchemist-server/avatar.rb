@@ -1,16 +1,23 @@
 # encoding: utf-8
 module Alchemist
   class Avatar
-    attr_reader :name, :x, :y
+    attr_reader :name, :x, :y, :inventory
 
-    def initialize(name, x = 0, y = 0)
+    def initialize(name, x = 0, y = 0, inventory = "")
       @name = name
       @x = x.to_i
       @y = y.to_i
+      @inventory = inventory
     end
 
     def move(direction, max_x, max_y)
-      Avatar.new name, *direction.move_from(x, y, max_x, max_y)
+      Avatar.new name,
+                 *direction.move_from(x, y, max_x, max_y),
+                 @inventory
+    end
+
+    def add_to_inventory(additions)
+      Avatar.new name, x, y, (@inventory + additions).gsub(' ','')
     end
 
     def hash
@@ -27,7 +34,7 @@ module Alchemist
     end
 
     def to_s
-      "⚲ #{name} #{x} #{y}"
+      "⚲ #{name} #{x} #{y} #{@inventory}"
     end
 
     def self.parse(string)

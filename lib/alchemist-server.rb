@@ -6,12 +6,17 @@ require "alchemist-server/version"
 require "alchemist-server/avatar"
 require "alchemist-server/direction"
 require "alchemist-server/event"
+require "alchemist-server/geography"
 require "alchemist-server/world"
 require "alchemist-server/world_history"
 
 require "alchemist-server/commands/appear"
+require "alchemist-server/commands/at"
 require "alchemist-server/commands/directions"
 require "alchemist-server/commands/generate"
+require "alchemist-server/commands/geography"
+require "alchemist-server/commands/inventory"
+require "alchemist-server/commands/take"
 
 class Object
   def try(sym, *args)
@@ -40,11 +45,14 @@ module Alchemist
     def self.run_command_module(command_string, world_file, command_mod, *args)
       history = load_history world_file
       response, new_world = command_mod.run history, *args
-      event = Event.new command_string, new_world, Time.now
-      new_history = WorldHistory.new event, history
 
-      File.open(world_file,'w') do |f|
-        f.write new_history.to_s
+      if new_world
+        event = Event.new command_string, new_world, Time.now
+        new_history = WorldHistory.new event, history
+
+        File.open(world_file,'w') do |f|
+          f.write new_history.to_s
+        end
       end
 
       response
@@ -80,11 +88,15 @@ module Alchemist
 
   COMMANDS = [
     Commands::Appear,
+    Commands::At,
     Commands::Generate,
     Commands::North,
     Commands::South,
     Commands::East,
     Commands::West,
+    Commands::Inventory,
+    Commands::Geography,
+    Commands::Take,
   ]
 end
 

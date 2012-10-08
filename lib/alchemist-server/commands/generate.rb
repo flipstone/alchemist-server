@@ -7,7 +7,8 @@ module Alchemist
         end
 
         def run(history, x, y)
-          w = World.new [], y.to_i.times.map { ee(x.to_i) }.join("\n")
+          geo = Alchemist::Geography.new y.to_i.times.map { ee(x.to_i) }.join("\n")
+          w = World.new [], geo
           return w.geography, w
         end
 
