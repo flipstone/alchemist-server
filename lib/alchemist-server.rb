@@ -4,13 +4,14 @@ require "hamster"
 require "alchemist-server/version"
 
 require "alchemist-server/avatar"
-require "alchemist-server/commands/appear"
-require "alchemist-server/commands/generate"
-require "alchemist-server/commands/south"
 require "alchemist-server/direction"
 require "alchemist-server/event"
 require "alchemist-server/world"
 require "alchemist-server/world_history"
+
+require "alchemist-server/commands/appear"
+require "alchemist-server/commands/directions"
+require "alchemist-server/commands/generate"
 
 class Object
   def try(sym, *args)
@@ -60,7 +61,7 @@ module Alchemist
       when /^dim(ensions)?$/
         load_history(world_file).world.dimensions(*args).to_s
       else
-        "Unknown Command: #{command}"
+        "Unknown Command: #{command_string}"
       end
     end
 
@@ -80,7 +81,10 @@ module Alchemist
   COMMANDS = [
     Commands::Appear,
     Commands::Generate,
-    Commands::South
+    Commands::North,
+    Commands::South,
+    Commands::East,
+    Commands::West,
   ]
 end
 
