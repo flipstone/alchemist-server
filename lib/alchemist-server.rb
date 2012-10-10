@@ -12,6 +12,7 @@ require "alchemist-server/world_history"
 
 require "alchemist-server/commands/appear"
 require "alchemist-server/commands/at"
+require "alchemist-server/commands/create"
 require "alchemist-server/commands/directions"
 require "alchemist-server/commands/generate"
 require "alchemist-server/commands/geography"
@@ -90,6 +91,7 @@ module Alchemist
   COMMANDS = [
     Commands::Appear,
     Commands::At,
+    Commands::Create,
     Commands::Generate,
     Commands::North,
     Commands::South,

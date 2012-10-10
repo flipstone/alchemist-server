@@ -52,6 +52,13 @@ module Alchemist
       end
     end
 
+    def create(avatar_name, c)
+      a = avatar(avatar_name)
+      new_a = a.add_to_inventory c
+
+      World.new @avatars - [a] + [new_a], @geography
+    end
+
     def move(avatar_name, direction)
       a = avatar(avatar_name)
       a_prime = a.move direction, *dimensions
