@@ -69,8 +69,6 @@ module Alchemist
         File.read(world_file)
       when /^show_history$/
         load_history(world_file).to_s
-      when /^loc(ation)?$/
-        load_history(world_file).world.location(*args).to_s
       when /^dim(ensions)?$/
         load_history(world_file).world.dimensions(*args).to_s
       else
