@@ -54,7 +54,7 @@ module Alchemist
     def avatar(name)
       locator = Avatar.new name
       @avatars.detect { |a| a == locator } ||
-      raise("#{avatar_name} isn't in the world")
+      raise("#{name} isn't in the world")
     end
 
     def at(avatar_name)
