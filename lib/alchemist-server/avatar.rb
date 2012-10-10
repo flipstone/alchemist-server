@@ -1,6 +1,7 @@
 # encoding: utf-8
 module Alchemist
   class Avatar
+    INVENTORY_SIZE = 64
     attr_reader :name, :x, :y, :inventory
 
     def initialize(name, x = 0, y = 0, inventory = "")
@@ -17,7 +18,11 @@ module Alchemist
     end
 
     def add_to_inventory(additions)
-      Avatar.new name, x, y, (@inventory + additions).gsub(' ','')
+      Avatar.new(name, x, y, (@inventory + additions).gsub(' ','')).tap do |a|
+        if a.inventory.length > INVENTORY_SIZE
+          raise "You can only carry #{INVENTORY_SIZE} items"
+        end
+      end
     end
 
     def remove_from_inventory(*removals)
