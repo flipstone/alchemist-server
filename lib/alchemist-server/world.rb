@@ -18,18 +18,17 @@ module Alchemist
 
     def avatar(name)
       locator = Avatar.new name
-      @avatars.detect { |a| a == locator }
+      @avatars.detect { |a| a == locator } ||
+      raise("#{avatar_name} isn't in the world")
     end
 
     def at(avatar_name)
       a = avatar(avatar_name)
-      return unless a
       @geography.at a.x, a.y
     end
 
     def take(avatar_name)
       a = avatar(avatar_name)
-      return self unless a
 
       resource = geography.at a.x, a.y
       new_a = a.add_to_inventory resource
@@ -39,11 +38,22 @@ module Alchemist
                 new_g
     end
 
+    def put(avatar_name, c)
+      a = avatar(avatar_name)
+
+      if a.has? c
+        new_g = geography.put a.x, a.y, c
+        new_a = a.remove_from_inventory c
+
+        World.new @avatars - [a] + [new_a],
+                  new_g
+      else
+        raise "#{avatar_name} doesn't have #{c}"
+      end
+    end
+
     def move(avatar_name, direction)
       a = avatar(avatar_name)
-      return self unless a
-
-
       a_prime = a.move direction, *dimensions
 
       World.new @avatars - [a] + [a_prime],

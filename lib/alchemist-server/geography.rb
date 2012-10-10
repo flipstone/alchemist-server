@@ -14,6 +14,16 @@ module Alchemist
       Geography.new s
     end
 
+    def put(x,y,c)
+      s = @s.dup
+      if s[offset(x,y)] != ' '
+        raise "#{s[offset(x,y)]} is already at #{x}, #{y}"
+      end
+
+      s[offset(x,y)] = c[0..1]
+      Geography.new s
+    end
+
     def to_s
       @s
     end

@@ -16,6 +16,7 @@ require "alchemist-server/commands/directions"
 require "alchemist-server/commands/generate"
 require "alchemist-server/commands/geography"
 require "alchemist-server/commands/inventory"
+require "alchemist-server/commands/put"
 require "alchemist-server/commands/take"
 
 class Object
@@ -96,6 +97,7 @@ module Alchemist
     Commands::West,
     Commands::Inventory,
     Commands::Geography,
+    Commands::Put,
     Commands::Take,
   ]
 end
