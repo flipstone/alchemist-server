@@ -6,7 +6,13 @@ module Alchemist
     end
 
     def world
-      @event.new_world
+      @world ||=
+        if @prior_history.nil?
+          World.genesis
+        else
+          _, world = @event.happen @prior_history
+          world || @prior_history.world
+        end
     end
 
     def to_s
@@ -24,6 +30,10 @@ module Alchemist
 
     def self.split_into_chronological_events(string)
       string.split("\n\n").reject { |l| l =~ /^\s*$/ }.reverse
+    end
+
+    def self.genesis
+      new Event.genesis, nil
     end
   end
 end

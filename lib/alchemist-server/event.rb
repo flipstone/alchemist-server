@@ -1,24 +1,40 @@
 module Alchemist
   class Event
-    attr_reader :new_world
+    attr_reader :command_string
 
-    def initialize(command, new_world, time)
-      @command = command
-      @new_world = new_world
+    def initialize(command_string, time)
+      @command_string = command_string
       @time = time
+    end
+
+    def happen(history)
+      command, *args = @command_string.split /\s+/
+
+      if command_mod = COMMANDS.detect { |c| match_command? command, c }
+        command_mod.run history, *args
+      end
     end
 
     def to_s
       <<-str
-#{@command}
+#{@command_string}
 #{@time}
-#{@new_world}
       str
     end
 
+    protected
+
+    def match_command?(command_name, command)
+      command_name =~ /^#{command.pattern}/
+    end
+
     def self.parse(string)
-      command, time, world_string = string.split("\n",3)
-      new command, World.parse(world_string), Time.parse(time)
+      command_string, time, world_string = string.split("\n",3)
+      new command_string, Time.parse(time)
+    end
+
+    def self.genesis
+      new 'genesis', Time.now
     end
   end
 end

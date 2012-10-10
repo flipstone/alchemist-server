@@ -14,7 +14,6 @@ require "alchemist-server/commands/appear"
 require "alchemist-server/commands/at"
 require "alchemist-server/commands/create"
 require "alchemist-server/commands/directions"
-require "alchemist-server/commands/generate"
 require "alchemist-server/commands/geography"
 require "alchemist-server/commands/inventory"
 require "alchemist-server/commands/put"
@@ -46,10 +45,10 @@ module Alchemist
 
     def self.run_command_module(command_string, world_file, command_mod, *args)
       history = load_history world_file
-      response, new_world = command_mod.run history, *args
+      event = Event.new command_string, Time.now
+      response, new_world = event.happen history
 
       if new_world
-        event = Event.new command_string, new_world, Time.now
         new_history = WorldHistory.new event, history
 
         File.open(world_file,'w') do |f|
@@ -79,7 +78,7 @@ module Alchemist
       if File.exist? file_name
         WorldHistory.parse File.read(file_name)
       else
-        nil
+        WorldHistory.genesis
       end
     end
 
@@ -92,7 +91,6 @@ module Alchemist
     Commands::Appear,
     Commands::At,
     Commands::Create,
-    Commands::Generate,
     Commands::North,
     Commands::South,
     Commands::East,

@@ -61,7 +61,7 @@ module Alchemist
 
     def move(avatar_name, direction)
       a = avatar(avatar_name)
-      a_prime = a.move direction, *dimensions
+      a_prime = a.move direction
 
       World.new @avatars - [a] + [a_prime],
                 @geography
@@ -76,13 +76,8 @@ module Alchemist
       @geography.dimensions
     end
 
-    def self.parse(string)
-      avatars = string.lines.to_list
-                .map { |l| Avatar.parse l }
-                .take_while { |a| a }
-
-      geo = Geography.new string.lines.drop(avatars.length).join('')
-      new avatars.to_set, geo
+    def self.genesis
+      new [], Geography.new
     end
   end
 end

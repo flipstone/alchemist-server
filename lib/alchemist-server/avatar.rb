@@ -10,9 +10,9 @@ module Alchemist
       @inventory = inventory
     end
 
-    def move(direction, max_x, max_y)
+    def move(direction)
       Avatar.new name,
-                 *direction.move_from(x, y, max_x, max_y),
+                 *direction.move_from(x, y),
                  @inventory
     end
 
