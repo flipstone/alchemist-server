@@ -8,10 +8,10 @@ module Alchemist
     end
 
     def happen(history)
-      command, *args = @command_string.split /\s+/
+      avatar_name, command, *args = @command_string.split /\s+/
 
       if command_mod = COMMANDS.detect { |c| match_command? command, c }
-        command_mod.run history, *args
+        command_mod.run avatar_name, history, *args
       end
     end
 

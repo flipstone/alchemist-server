@@ -8,7 +8,7 @@ module Alchemist
         @direction = direction
       end
 
-      def run(history, avatar_name)
+      def run(avatar_name, history)
         world = history.world.move avatar_name, @direction
 
         return "#{avatar_name} is now at #{world.location(avatar_name)}",

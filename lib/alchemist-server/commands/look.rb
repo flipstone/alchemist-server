@@ -1,12 +1,12 @@
 module Alchemist
   module Commands
-    module At
+    module Look
       class <<self
         def pattern
-          "at"
+          "look"
         end
 
-        def run(history, avatar_name)
+        def run(avatar_name, history)
           history.world.at avatar_name
         end
       end

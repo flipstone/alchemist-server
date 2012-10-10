@@ -12,13 +12,14 @@ require "alchemist-server/world"
 require "alchemist-server/world_history"
 
 require "alchemist-server/commands/appear"
-require "alchemist-server/commands/at"
 require "alchemist-server/commands/create"
 require "alchemist-server/commands/directions"
 require "alchemist-server/commands/forge"
 require "alchemist-server/commands/formulate"
 require "alchemist-server/commands/geography"
 require "alchemist-server/commands/inventory"
+require "alchemist-server/commands/location"
+require "alchemist-server/commands/look"
 require "alchemist-server/commands/put"
 require "alchemist-server/commands/take"
 
@@ -37,16 +38,16 @@ end
 module Alchemist
   module Server
     def self.one_shot(world_file, command_string)
-      command, *args = command_string.split /\s+/
+      avatar_name, command, *args = command_string.split /\s+/
 
       if command_mod = COMMANDS.detect { |c| match_command? command, c }
-        run_command_module command_string, world_file, command_mod, *args
+        run_command_module command_string, world_file, command_mod
       else
         run_special_command world_file, command, *args
       end
     end
 
-    def self.run_command_module(command_string, world_file, command_mod, *args)
+    def self.run_command_module(command_string, world_file, command_mod)
       history = load_history world_file
       event = Event.new command_string, Time.now
       response, new_world = event.happen history
@@ -92,7 +93,6 @@ module Alchemist
 
   COMMANDS = [
     Commands::Appear,
-    Commands::At,
     Commands::Create,
     Commands::North,
     Commands::South,
@@ -102,6 +102,8 @@ module Alchemist
     Commands::Forge,
     Commands::Formulate,
     Commands::Geography,
+    Commands::Location,
+    Commands::Look,
     Commands::Put,
     Commands::Take,
   ]

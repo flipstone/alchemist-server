@@ -6,8 +6,8 @@ module Alchemist
           "put"
         end
 
-        def run(world_history, avatar_name, resource)
-          world = world_history.world.put avatar_name, resource
+        def run(avatar_name, history, resource)
+          world = history.world.put avatar_name, resource
           a = world.avatar avatar_name
 
           return "#{avatar_name}'s Inventory: #{a.try :inventory}",

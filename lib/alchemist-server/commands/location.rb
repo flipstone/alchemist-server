@@ -1,14 +1,13 @@
 module Alchemist
   module Commands
-    module Appear
+    module Location
       class <<self
         def pattern
-          "app(ear)?"
+          "loc(ation)?"
         end
 
         def run(avatar_name, history)
-          return "Greetings, #{avatar_name}.",
-                 history.world.new_avatar(avatar_name)
+          history.world.location(avatar_name).to_s
         end
       end
     end

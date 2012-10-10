@@ -6,8 +6,8 @@ module Alchemist
           "geo(graphy)?"
         end
 
-        def run(world_history)
-          world_history.world.geography
+        def run(avatar_name, history)
+          history.world.geography
         end
       end
     end

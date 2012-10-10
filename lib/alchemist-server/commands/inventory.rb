@@ -6,8 +6,8 @@ module Alchemist
           "inv(entory)?"
         end
 
-        def run(world_history, avatar_name)
-          world_history.world.avatar(avatar_name).try :inventory
+        def run(avatar_name, history)
+          history.world.avatar(avatar_name).inventory
         end
       end
     end
