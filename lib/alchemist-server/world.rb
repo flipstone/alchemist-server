@@ -2,8 +2,9 @@ module Alchemist
   class World
     attr_reader :geography
 
-    def initialize(avatars, geography)
+    def initialize(avatars, formulas, geography)
       @avatars = avatars
+      @formulas = formulas
       @geography = geography
     end
 
@@ -13,7 +14,41 @@ module Alchemist
 
     def new_avatar(name)
       a = Avatar.new name
-      World.new @avatars | [a], @geography
+      World.new @avatars | [a], @formulas, @geography
+    end
+
+    def formulate(avatar_name, elem_1, elem_2, novel_elem)
+      if @formulas[novel_elem].nil?
+        f = Formula.new elem_1, elem_2, novel_elem
+
+        w = World.new @avatars,
+                      @formulas.put(novel_elem, f),
+                      @geography
+        w.forge(avatar_name, elem_1, elem_2, novel_elem)
+      else
+        raise "There is already a formula for #{novel_elem}"
+      end
+    end
+
+    def forge(avatar_name, elem_1, elem_2, result)
+      a = avatar avatar_name
+
+      if !a.has?(elem_1, elem_2)
+        raise "#{avatar_name} doesn't have the required elements"
+      end
+
+      f = Formula.new elem_1, elem_2, result
+
+      if @formulas[result] == f
+        a_temp = a.remove_from_inventory elem_1, elem_2
+        a_prime = a_temp.add_to_inventory result
+
+        World.new @avatars - [a] + [a_prime],
+                  @formulas,
+                  @geography
+      else
+        raise "Incorrect formula for #{result}"
+      end
     end
 
     def avatar(name)
@@ -35,6 +70,7 @@ module Alchemist
       new_g = geography.take a.x, a.y
 
       World.new @avatars - [a] + [new_a],
+                @formulas,
                 new_g
     end
 
@@ -46,6 +82,7 @@ module Alchemist
         new_a = a.remove_from_inventory c
 
         World.new @avatars - [a] + [new_a],
+                  @formulas,
                   new_g
       else
         raise "#{avatar_name} doesn't have #{c}"
@@ -56,7 +93,9 @@ module Alchemist
       a = avatar(avatar_name)
       new_a = a.add_to_inventory c
 
-      World.new @avatars - [a] + [new_a], @geography
+      World.new @avatars - [a] + [new_a],
+                @formulas,
+                @geography
     end
 
     def move(avatar_name, direction)
@@ -64,6 +103,7 @@ module Alchemist
       a_prime = a.move direction
 
       World.new @avatars - [a] + [a_prime],
+                @formulas,
                 @geography
     end
 
@@ -77,7 +117,7 @@ module Alchemist
     end
 
     def self.genesis
-      new [], Geography.new
+      World.new [], Hamster.hash, Geography.new
     end
   end
 end

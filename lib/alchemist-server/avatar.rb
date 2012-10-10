@@ -20,16 +20,16 @@ module Alchemist
       Avatar.new name, x, y, (@inventory + additions).gsub(' ','')
     end
 
-    def remove_from_inventory(removal)
-      remover = removal.split('').reduce(-> x { x }) do |r, c|
+    def remove_from_inventory(*removals)
+      remover = removals.join('').split('').reduce(-> x { x }) do |r, c|
         -> x { r[x].sub(c,'') }
       end
 
       Avatar.new name, x, y, remover[@inventory]
     end
 
-    def has?(c)
-      @inventory.include? c
+    def has?(*items)
+      items.all? { |i| @inventory.include? i }
     end
 
     def hash

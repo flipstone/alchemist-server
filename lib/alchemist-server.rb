@@ -6,6 +6,7 @@ require "alchemist-server/version"
 require "alchemist-server/avatar"
 require "alchemist-server/direction"
 require "alchemist-server/event"
+require "alchemist-server/formula"
 require "alchemist-server/geography"
 require "alchemist-server/world"
 require "alchemist-server/world_history"
@@ -14,6 +15,8 @@ require "alchemist-server/commands/appear"
 require "alchemist-server/commands/at"
 require "alchemist-server/commands/create"
 require "alchemist-server/commands/directions"
+require "alchemist-server/commands/forge"
+require "alchemist-server/commands/formulate"
 require "alchemist-server/commands/geography"
 require "alchemist-server/commands/inventory"
 require "alchemist-server/commands/put"
@@ -96,6 +99,8 @@ module Alchemist
     Commands::East,
     Commands::West,
     Commands::Inventory,
+    Commands::Forge,
+    Commands::Formulate,
     Commands::Geography,
     Commands::Put,
     Commands::Take,
