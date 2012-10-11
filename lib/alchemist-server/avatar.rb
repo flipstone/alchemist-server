@@ -46,7 +46,9 @@ module Alchemist
     end
 
     def has?(*items)
-      items.all? { |i| inventory.include? i }
+      items.all? do |i|
+        inventory.include? i
+      end
     end
 
     def hash

@@ -1,7 +1,7 @@
 module Alchemist
   class World
     include Record
-    record_attr :avatars, :formulas, :geography
+    record_attr :avatars, :formulas, :geography, :elements
 
     def to_s
       (avatars.to_a.map(&:to_s) + [geography]).join("\n")
@@ -15,6 +15,11 @@ module Alchemist
                      messages: Hamster.hash
 
       update avatars: avatars | [a]
+    end
+
+    def new_element(char, name)
+      e = Element.new symbol: char, name: name, basic: true
+      update elements: elements.put(char, e)
     end
 
     def formulate(avatar_name, elem_1, elem_2, novel_elem)
@@ -86,6 +91,14 @@ module Alchemist
       a = avatar(avatar_name)
       new_a = a.add_to_inventory c
 
+      element = elements[c]
+
+      if element.nil?
+        raise "Unknown element: #{c}."
+      elsif !element.basic
+        raise "#{c} is not a basic element."
+      end
+
       update avatars: avatars - [a] + [new_a]
     end
 
@@ -124,7 +137,8 @@ module Alchemist
     def self.genesis
       World.new avatars: [],
                 formulas: Hamster.hash,
-                geography: Geography.new
+                geography: Geography.new,
+                elements: Hamster.hash
     end
   end
 end

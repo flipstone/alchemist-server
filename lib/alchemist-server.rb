@@ -9,6 +9,7 @@ require "alchemist-server/record"
 
 require "alchemist-server/avatar"
 require "alchemist-server/direction"
+require "alchemist-server/element"
 require "alchemist-server/event"
 require "alchemist-server/formula"
 require "alchemist-server/geography"
@@ -19,6 +20,7 @@ require "alchemist-server/world_history"
 require "alchemist-server/commands/appear"
 require "alchemist-server/commands/create"
 require "alchemist-server/commands/directions"
+require "alchemist-server/commands/element"
 require "alchemist-server/commands/forge"
 require "alchemist-server/commands/formulate"
 require "alchemist-server/commands/geography"
@@ -51,7 +53,8 @@ module Alchemist
       puts "Listening on #{SERVER_PORT}"
     end
 
-    def self.one_shot(world_file, command_string)
+    def self.one_shot(world_file, command_string_ascii)
+      command_string = command_string_ascii.force_encoding Encoding::UTF_8
       avatar_name, command, *args = command_string.split /\s+/
 
       if command_mod = COMMANDS.detect { |c| match_command? command, c }
@@ -110,6 +113,7 @@ module Alchemist
     Commands::South,
     Commands::East,
     Commands::West,
+    Commands::Element,
     Commands::Inventory,
     Commands::Forge,
     Commands::Formulate,
