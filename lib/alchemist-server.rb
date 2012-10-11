@@ -14,6 +14,7 @@ require "alchemist-server/event"
 require "alchemist-server/formula"
 require "alchemist-server/geography"
 require "alchemist-server/server_handler"
+require "alchemist-server/unicode_monospace"
 require "alchemist-server/world"
 require "alchemist-server/world_history"
 

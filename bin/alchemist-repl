@@ -30,7 +30,7 @@ loop do
 
      result = Alchemist::Server.one_shot world_file, line
 
-     wr.write result
+     wr.write result.to_s.pad_to_unicode_monospace
      wr.flush
      wr.close
      exit! 0
