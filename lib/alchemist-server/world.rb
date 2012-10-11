@@ -1,29 +1,27 @@
 module Alchemist
   class World
-    attr_reader :geography
-
-    def initialize(avatars, formulas, geography)
-      @avatars = avatars
-      @formulas = formulas
-      @geography = geography
-    end
+    include Record
+    record_attr :avatars, :formulas, :geography
 
     def to_s
-      (@avatars.to_a.map(&:to_s) + [@geography]).join("\n")
+      (avatars.to_a.map(&:to_s) + [geography]).join("\n")
     end
 
     def new_avatar(name)
-      a = Avatar.new name
-      World.new @avatars | [a], @formulas, @geography
+      a = Avatar.new name: name,
+                     x: 0,
+                     y: 0,
+                     inventory: "",
+                     messages: Hamster.hash
+
+      update avatars: avatars | [a]
     end
 
     def formulate(avatar_name, elem_1, elem_2, novel_elem)
-      if @formulas[novel_elem].nil?
+      if formulas[novel_elem].nil?
         f = Formula.new elem_1, elem_2, novel_elem
+        w = update formulas: formulas.put(novel_elem, f)
 
-        w = World.new @avatars,
-                      @formulas.put(novel_elem, f),
-                      @geography
         w.forge(avatar_name, elem_1, elem_2, novel_elem)
       else
         raise "There is already a formula for #{novel_elem}"
@@ -39,27 +37,24 @@ module Alchemist
 
       f = Formula.new elem_1, elem_2, result
 
-      if @formulas[result] == f
+      if formulas[result] == f
         a_temp = a.remove_from_inventory elem_1, elem_2
         a_prime = a_temp.add_to_inventory result
 
-        World.new @avatars - [a] + [a_prime],
-                  @formulas,
-                  @geography
+        update avatars: avatars - [a] + [a_prime]
       else
         raise "Incorrect formula for #{result}"
       end
     end
 
     def avatar(name)
-      locator = Avatar.new name
-      @avatars.detect { |a| a == locator } ||
+      avatars.detect { |a| a.name == name } ||
       raise("#{name} isn't in the world")
     end
 
     def at(avatar_name)
       a = avatar(avatar_name)
-      @geography.at a.x, a.y
+      geography.at a.x, a.y
     end
 
     def take(avatar_name)
@@ -69,9 +64,8 @@ module Alchemist
       new_a = a.add_to_inventory resource
       new_g = geography.take a.x, a.y
 
-      World.new @avatars - [a] + [new_a],
-                @formulas,
-                new_g
+      update avatars: avatars - [a] + [new_a],
+             geography: new_g
     end
 
     def put(avatar_name, c)
@@ -81,9 +75,8 @@ module Alchemist
         new_g = geography.put a.x, a.y, c
         new_a = a.remove_from_inventory c
 
-        World.new @avatars - [a] + [new_a],
-                  @formulas,
-                  new_g
+        update avatars: avatars - [a] + [new_a],
+               geography: new_g
       else
         raise "#{avatar_name} doesn't have #{c}"
       end
@@ -93,18 +86,30 @@ module Alchemist
       a = avatar(avatar_name)
       new_a = a.add_to_inventory c
 
-      World.new @avatars - [a] + [new_a],
-                @formulas,
-                @geography
+      update avatars: avatars - [a] + [new_a]
     end
 
     def move(avatar_name, direction)
       a = avatar(avatar_name)
       a_prime = a.move direction
 
-      World.new @avatars - [a] + [a_prime],
-                @formulas,
-                @geography
+      update avatars: avatars - [a] + [a_prime]
+    end
+
+    def put_message(avatar_name, key, message)
+      a = avatar(avatar_name)
+      a_prime = a.put_message key, message
+
+      update avatars: avatars - [a] + [a_prime]
+    end
+
+    def messages_for(avatar_name)
+      a = avatar(avatar_name)
+      messengers = avatars.select { |m| m.location == a.location }
+
+      messengers.sort_by(&:name).map do |m|
+        { m.name => m.message_list }
+      end.reduce({}, :merge)
     end
 
     def location(avatar_name)
@@ -113,11 +118,13 @@ module Alchemist
     end
 
     def dimensions
-      @geography.dimensions
+      geography.dimensions
     end
 
     def self.genesis
-      World.new [], Hamster.hash, Geography.new
+      World.new avatars: [],
+                formulas: Hamster.hash,
+                geography: Geography.new
     end
   end
 end

@@ -5,6 +5,7 @@ require "eventmachine"
 require "em/protocols/line_protocol"
 
 require "alchemist-server/version"
+require "alchemist-server/record"
 
 require "alchemist-server/avatar"
 require "alchemist-server/direction"
@@ -24,7 +25,9 @@ require "alchemist-server/commands/geography"
 require "alchemist-server/commands/inventory"
 require "alchemist-server/commands/location"
 require "alchemist-server/commands/look"
+require "alchemist-server/commands/message"
 require "alchemist-server/commands/put"
+require "alchemist-server/commands/read"
 require "alchemist-server/commands/take"
 
 class Object
@@ -113,7 +116,9 @@ module Alchemist
     Commands::Geography,
     Commands::Location,
     Commands::Look,
+    Commands::Message,
     Commands::Put,
+    Commands::Read,
     Commands::Take,
   ]
 end
