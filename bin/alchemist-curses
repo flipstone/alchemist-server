@@ -1,0 +1,100 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH << "../lib"
+
+require 'bundler'
+Bundler.setup
+
+require 'alchemist-server'
+require 'ffi-ncurses'
+
+host = ARGV[0] || 'localhost'
+port = (ARGV[1] || 7900).to_i
+
+def start(host, port)
+  EventMachine.run do
+    EventMachine.connect host, port, Handler
+  end
+end
+
+module Handler
+  include FFI::NCurses
+  include EventMachine::Protocols::LineProtocol
+
+  def receive_line(line)
+    if line =~ /^Welcome, alchemical friend/
+      login
+    elsif line =~ /^Greetings/
+      login_success
+    elsif line =~ /has appeared/
+      appear_success
+    else
+      printw line
+      refresh
+    end
+  end
+
+  def login
+    EM.defer(-> { prompt "Enter your name:" },
+             -> name do
+      send_data name
+      send_data "\n"
+    end)
+  end
+
+  def login_success
+    printw "Appearing...\n"
+    refresh
+    send_data "appear\n"
+  end
+
+  def appear_success
+    clear
+    send_data "look\n"
+    refresh
+  end
+
+  def prompt(text)
+    printw text
+    printw ' '
+    answer = ''
+
+    while (c = getch) != "\n".ord
+      answer << c
+      printw (''<<c)
+    end
+
+    printw "\n"
+    refresh
+
+    answer.strip
+  end
+end
+
+begin
+  # tell the terminal to enter curses mode
+  FFI::NCurses.initscr
+  FFI::NCurses.noecho
+
+  # prints "Hello World !!!" at the current location (0,0)
+  FFI::NCurses.printw "Connecting.... to #{host}:#{port}\n"
+
+  # causes changes to be displayed on the screen - maybe this means that NCurses
+  # uses front and back buffers for drawing?
+  FFI::NCurses.refresh
+  FFI::NCurses.keypad FFI::NCurses.stdscr, true
+
+  start host, port
+
+  ## blocks until the user presses a key
+  #10.times do
+  #  c = FFI::NCurses.getch
+  #  FFI::NCurses.printw c.to_s
+  #  FFI::NCurses.printw " "
+  #end
+
+ensure
+  # returns back to regular console mode
+  FFI::NCurses.endwin
+end
+
