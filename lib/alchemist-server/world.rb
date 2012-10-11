@@ -1,6 +1,7 @@
 module Alchemist
   class World
     include Record
+    LOOK_RANGE = 10
     record_attr :avatars, :formulas, :geography, :elements
 
     def to_s
@@ -19,6 +20,7 @@ module Alchemist
 
     def new_element(char, name)
       e = Element.new symbol: char, name: name, basic: true
+
       update elements: elements.put(char, e)
     end
 
@@ -60,6 +62,11 @@ module Alchemist
     def at(avatar_name)
       a = avatar(avatar_name)
       geography.at a.x, a.y
+    end
+
+    def look(avatar_name)
+      a = avatar(avatar_name)
+      geography.string_around a.x, a.y, LOOK_RANGE
     end
 
     def take(avatar_name)

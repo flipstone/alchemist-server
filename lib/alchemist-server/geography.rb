@@ -25,9 +25,19 @@ module Alchemist
       Geography.new locations.put(loc, c[0..1])
     end
 
-    def to_s
-      (min_x, max_x), (min_y, max_y) = dimensions
+    def string_around(x,y,range)
+      string_within x - range,
+                    y - range,
+                    x + range,
+                    y + range
+    end
 
+    def to_s
+      (min_x, min_y), (max_x, max_y) = dimensions
+      string_within min_x, min_y, max_x, max_y
+    end
+
+    def string_within(min_x, min_y, max_x, max_y)
       if min_x && min_y && max_x && max_y
         (min_y..max_y).map do |y|
           (min_x..max_x).map do |x|
@@ -39,11 +49,12 @@ module Alchemist
       end
     end
 
+
     def dimensions
       points = locations.keys
       xs,ys = points.map(&:x), points.map(&:y)
 
-      [[xs.min, xs.max],[ys.min,ys.max]]
+      [[xs.min, ys.min],[xs.max,ys.max]]
     end
 
     private
@@ -71,6 +82,11 @@ module Alchemist
 
       def hash
         (@x.hash * 31) + @y.hash
+      end
+
+      def within?(min, max)
+        min.x <= x && x <= max.x &&
+        min.y <= y && y <= max.y
       end
 
       def ==(other)

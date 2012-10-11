@@ -7,7 +7,7 @@ module Alchemist
         end
 
         def run(avatar_name, history)
-          history.world.at avatar_name
+          history.world.look(avatar_name)
         end
       end
     end

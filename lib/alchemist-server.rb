@@ -24,7 +24,6 @@ require "alchemist-server/commands/directions"
 require "alchemist-server/commands/element"
 require "alchemist-server/commands/forge"
 require "alchemist-server/commands/formulate"
-require "alchemist-server/commands/geography"
 require "alchemist-server/commands/inventory"
 require "alchemist-server/commands/location"
 require "alchemist-server/commands/look"
@@ -89,6 +88,8 @@ module Alchemist
         load_history(world_file).to_s
       when /^dim(ensions)?$/
         load_history(world_file).world.dimensions(*args).to_s
+      when /^geo(graphy)?$/
+        load_history(world_file).world.geography.to_s
       else
         "Unknown Command: #{command_string}"
       end
@@ -118,7 +119,6 @@ module Alchemist
     Commands::Inventory,
     Commands::Forge,
     Commands::Formulate,
-    Commands::Geography,
     Commands::Location,
     Commands::Look,
     Commands::Message,
