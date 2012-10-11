@@ -1,2 +1,15 @@
 #!/usr/bin/env ruby
 #
+$LOAD_PATH << "../lib"
+
+require 'bundler'
+Bundler.setup
+
+require 'alchemist-server'
+
+world_file = ARGV.first || "tmp/dev_world.alc"
+
+EventMachine.run do
+  Alchemist::Server.run world_file
+end
+

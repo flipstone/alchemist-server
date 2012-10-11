@@ -109,7 +109,7 @@ module Alchemist
 
     def location(avatar_name)
       a = avatar avatar_name
-      [a.try(:x), a.try(:y)]
+      [a.x, a.y]
     end
 
     def dimensions

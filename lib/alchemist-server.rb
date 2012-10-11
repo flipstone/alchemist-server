@@ -1,5 +1,8 @@
 require "time"
 require "hamster"
+require "socket"
+require "eventmachine"
+require "em/protocols/line_protocol"
 
 require "alchemist-server/version"
 
@@ -8,6 +11,7 @@ require "alchemist-server/direction"
 require "alchemist-server/event"
 require "alchemist-server/formula"
 require "alchemist-server/geography"
+require "alchemist-server/server_handler"
 require "alchemist-server/world"
 require "alchemist-server/world_history"
 
@@ -37,6 +41,13 @@ end
 
 module Alchemist
   module Server
+    SERVER_PORT = 79 * 100
+
+    def self.run(world_file)
+      EventMachine.start_server "", SERVER_PORT, ServerHandler.new(world_file)
+      puts "Listening on #{SERVER_PORT}"
+    end
+
     def self.one_shot(world_file, command_string)
       avatar_name, command, *args = command_string.split /\s+/
 
