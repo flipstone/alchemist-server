@@ -26,7 +26,12 @@ module Alchemist
 
       def receive_line(line)
         response = process_line line
-        send_line response if response
+
+        if response
+          send_line "response-to: #{line.split(' ').first.chomp}"
+          send_line response
+          send_line "response-end"
+        end
       end
 
       def process_line(line)

@@ -2,14 +2,14 @@ module Alchemist
   module UnicodeMonospace
     module StringExtensions
       def pad_to_unicode_monospace
-        split('').flat_map do |c|
+        force_encoding(Encoding::UTF_8).split('').flat_map do |c|
           next c if c == "\n"
 
           case UnicodeMonospace.east_asian_width(c)
           when /^F|W$/ then c
           else [c, ' ']
           end
-        end.join('')
+        end.join('').force_encoding(Encoding::UTF_8)
       end
     end
 

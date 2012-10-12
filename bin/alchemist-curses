@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: utf-8
 
 $LOAD_PATH << "../lib"
 
@@ -24,12 +25,31 @@ module Handler
   def receive_line(line)
     if line =~ /^Welcome, alchemical friend/
       login
-    elsif line =~ /^Greetings/
-      login_success
-    elsif line =~ /has appeared/
-      appear_success
-    else
-      printw line
+    elsif line =~ /^response-to: (.*)$/
+      @response_to = $1
+      @response = ''
+
+    elsif line =~ /^response-end$/
+      if @response_to
+        handle_response @response_to, @response
+      end
+
+      @response_to = nil
+      @response = nil
+    elsif @response
+      @response << line
+    end
+  end
+
+  def handle_response(response_to, response)
+    case response_to
+    when @name then login_success
+    when "appear" then appear_success
+    when "north","south","east","west" then look
+    when "look" then
+      clear
+      printw response.pad_to_unicode_monospace
+      wmove stdscr, 10, 20
       refresh
     end
   end
@@ -37,6 +57,7 @@ module Handler
   def login
     EM.defer(-> { prompt "Enter your name:" },
              -> name do
+      @name = name
       send_data name
       send_data "\n"
     end)
@@ -49,9 +70,24 @@ module Handler
   end
 
   def appear_success
-    clear
+    look
+    nav_loop
+  end
+
+  def look
     send_data "look\n"
-    refresh
+  end
+
+  def move(char)
+    case char
+    when KEY_LEFT then send_data "west\n"
+    when KEY_RIGHT then send_data "east\n"
+    when KEY_UP then send_data "north\n"
+    when KEY_DOWN then send_data "south\n"
+    else return false
+    end
+
+    true
   end
 
   def prompt(text)
@@ -60,8 +96,10 @@ module Handler
     answer = ''
 
     while (c = getch) != "\n".ord
-      answer << c
-      printw (''<<c)
+      if c > 0
+        answer << c
+        printw (''<<c)
+      end
     end
 
     printw "\n"
@@ -69,14 +107,28 @@ module Handler
 
     answer.strip
   end
+
+  def nav_loop
+    EM.defer(-> { getch },
+             -> c do
+                look if move c
+                nav_loop
+             end)
+  end
+end
+
+class UI
+  def initialize(handler)
+    @h = handler
+  end
 end
 
 begin
   # tell the terminal to enter curses mode
   FFI::NCurses.initscr
   FFI::NCurses.noecho
+  FFI::NCurses.halfdelay 1
 
-  # prints "Hello World !!!" at the current location (0,0)
   FFI::NCurses.printw "Connecting.... to #{host}:#{port}\n"
 
   # causes changes to be displayed on the screen - maybe this means that NCurses
@@ -85,14 +137,6 @@ begin
   FFI::NCurses.keypad FFI::NCurses.stdscr, true
 
   start host, port
-
-  ## blocks until the user presses a key
-  #10.times do
-  #  c = FFI::NCurses.getch
-  #  FFI::NCurses.printw c.to_s
-  #  FFI::NCurses.printw " "
-  #end
-
 ensure
   # returns back to regular console mode
   FFI::NCurses.endwin

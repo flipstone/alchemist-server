@@ -23,6 +23,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "rb-readline"
   s.add_runtime_dependency "hamster"
   s.add_runtime_dependency "eventmachine", ">= 1.0"
-  s.add_runtime_dependency "ncurses-ruby", ">= 1.2.1"
   s.add_runtime_dependency "ffi-ncurses", ">= 0.4.0"
 end
