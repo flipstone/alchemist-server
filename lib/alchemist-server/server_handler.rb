@@ -46,9 +46,7 @@ module Alchemist
           response = process_line line
 
           if response
-            send_line "response-to: #{line.split(' ').first.chomp}"
             send_line response
-            send_line "response-end"
           end
         end
 
@@ -69,7 +67,7 @@ module Alchemist
 
           if possible_name && possible_name.length > 0
             @name = possible_name
-            "Greetings, #{@name}."
+            "hello #{@name}"
           else
             "Please tell me your name."
           end
@@ -82,7 +80,10 @@ module Alchemist
 
       def send_line(data)
         send_data data
-        send_data "\n"
+
+        if data[-1] != "\n"
+          send_data "\n"
+        end
       end
     end
   end

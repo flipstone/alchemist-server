@@ -9,7 +9,7 @@ module Alchemist
         def run(avatar_name, history, char, name)
           world = history.world.new_element char, name
 
-          return "Element created.", world
+          return "element #{char}.", world
         end
       end
     end

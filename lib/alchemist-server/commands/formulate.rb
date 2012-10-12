@@ -13,7 +13,7 @@ module Alchemist
                                           novel_elem
           a = world.avatar avatar_name
 
-          return "#{avatar_name}'s Inventory: #{a.inventory}",
+          return "inventory #{a.inventory}",
                  world
         end
       end

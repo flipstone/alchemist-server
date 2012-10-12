@@ -10,7 +10,7 @@ module Alchemist
           world = history.world.create avatar_name, resource
           a = world.avatar avatar_name
 
-          return "#{avatar_name}'s Inventory: #{a.try :inventory}",
+          return "inventory #{a.try :inventory}",
                  world
         end
       end

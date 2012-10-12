@@ -7,7 +7,10 @@ module Alchemist
         end
 
         def run(avatar_name, history)
-          history.world.look(avatar_name)
+          [
+            "see #{World::LOOK_RANGE*2}",
+            history.world.look(avatar_name)
+          ].join("\n")
         end
       end
     end

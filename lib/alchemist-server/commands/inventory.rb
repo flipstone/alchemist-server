@@ -7,7 +7,7 @@ module Alchemist
         end
 
         def run(avatar_name, history)
-          history.world.avatar(avatar_name).inventory
+          "inventory #{history.world.avatar(avatar_name).inventory}"
         end
       end
     end

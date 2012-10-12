@@ -11,7 +11,7 @@ module Alchemist
                                             key,
                                             words.join(' ')
 
-          return "Message posted.", world
+          return "posted", world
         end
       end
     end

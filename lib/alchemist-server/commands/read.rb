@@ -9,9 +9,11 @@ module Alchemist
         def run(avatar_name, history)
           messages = history.world.messages_for avatar_name
 
-          messages.flat_map do |name, messages|
+          lines = messages.flat_map do |name, messages|
             ["#{name}:"] + messages + ['']
-          end.join("\n")
+          end
+
+          [ "messages #{lines.length}" ] + lines.join("\n")
         end
       end
     end

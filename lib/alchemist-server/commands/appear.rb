@@ -7,7 +7,7 @@ module Alchemist
         end
 
         def run(avatar_name, history)
-          return "#{avatar_name} has appeared in the world.",
+          return "appeared",
                  history.world.new_avatar(avatar_name)
         end
       end

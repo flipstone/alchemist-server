@@ -7,7 +7,7 @@ module Alchemist
         end
 
         def run(avatar_name, history)
-          history.world.location(avatar_name).to_s
+          "location #{history.world.location(avatar_name).to_s}"
         end
       end
     end
