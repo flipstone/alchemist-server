@@ -2,6 +2,7 @@ require "time"
 require "hamster"
 require "socket"
 require "eventmachine"
+require "benchmark"
 require "em/protocols/line_protocol"
 
 require "alchemist-server/version"
@@ -58,26 +59,32 @@ module Alchemist
       avatar_name, command, *args = command_string.split /\s+/
 
       if command_mod = COMMANDS.detect { |c| match_command? command, c }
-        run_command_module command_string, world_file, command_mod
+        run_command_module command_string, world_file
       else
         run_special_command world_file, command, *args
       end
     end
 
-    def self.run_command_module(command_string, world_file, command_mod)
+    def self.run_command_module(command_string, world_file)
       history = load_history world_file
+      response, _ = run_append command_string, world_file, history
+      response
+    end
+
+    def self.run_append(command_string, world_file, history)
       event = Event.new command_string, Time.now
       response, new_world = event.happen history
 
       if new_world
         new_history = WorldHistory.new event, history
 
-        File.open(world_file,'w') do |f|
-          f.write new_history.to_s
+        File.open(world_file,'a') do |f|
+          f.write "\n\n"
+          f.write event.to_s
         end
       end
 
-      response
+      return response, new_history
     end
 
     def self.run_special_command(world_file, command_string, *args)

@@ -17,8 +17,9 @@ module Alchemist
 
     def to_s
       <<-str.strip
-#{@event}
 #{@prior_history}
+
+#{@event}
       str
     end
 
@@ -29,7 +30,7 @@ module Alchemist
     end
 
     def self.split_into_chronological_events(string)
-      string.split("\n\n").reject { |l| l =~ /^\s*$/ }.reverse
+      string.split("\n\n").reject { |l| l =~ /^\s*$/ }
     end
 
     def self.genesis
