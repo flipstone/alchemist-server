@@ -22,8 +22,15 @@ module Handler
   include FFI::NCurses
   include EventMachine::Protocols::LineProtocol
 
+  INVENTORY_LABEL = 'Inventory: '
+  INVENTORY_SIZE = 64
+  INVENTORY_WIDTH = INVENTORY_LABEL.length + INVENTORY_SIZE*2
+
   def post_init
     @lines_to_read = nil
+    @border_win = newwin 22, 45, 0, 0
+    @geo_win = newwin 20, 43, 1, 1
+    @inventory_win = newwin 1, INVENTORY_WIDTH, 23, 0
   end
 
   def receive_line(line)
@@ -49,15 +56,35 @@ module Handler
     end
   end
 
+  def draw_geo_border
+    lr = '|'.ord
+    tb = '-'.ord
+    c = '+'.ord
+
+    wborder @border_win,lr,lr,tb,tb,c,c,c,c
+    wrefresh @border_win
+  end
+
+  def draw_geography(data)
+    wclear @geo_win
+    wmove @geo_win, 0, 0
+    wprintw @geo_win, data.pad_to_unicode_monospace
+    wmove @geo_win, 10, 20
+    wrefresh @geo_win
+  end
+
+  def draw_inventory(data)
+    wclear @inventory_win
+    wprintw @inventory_win, "#{INVENTORY_LABEL}#{data.pad_to_unicode_monospace}"
+    wrefresh @inventory_win
+  end
+
   def handle_response(command, data = nil)
     case command
     when "hello" then login_success
     when "appeared" then appear_success
-    when "see" then
-      clear
-      printw data.pad_to_unicode_monospace
-      wmove stdscr, 10, 20
-      refresh
+    when "see" then draw_geography data
+    when "inventory" then draw_inventory data
     end
   end
 
@@ -77,12 +104,18 @@ module Handler
   end
 
   def appear_success
+    draw_geo_border
     look
+    request_inventory
     nav_loop
   end
 
   def look
     send_data "look\n"
+  end
+
+  def request_inventory
+    send_data "inventory\n"
   end
 
   def move(char)
