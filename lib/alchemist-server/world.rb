@@ -141,6 +141,10 @@ module Alchemist
       geography.dimensions
     end
 
+    def basic_elements
+      elements.values.select(&:basic?)
+    end
+
     def self.genesis
       World.new avatars: [],
                 formulas: Hamster.hash,

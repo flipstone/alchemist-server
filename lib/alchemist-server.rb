@@ -20,6 +20,7 @@ require "alchemist-server/world"
 require "alchemist-server/world_history"
 
 require "alchemist-server/commands/appear"
+require "alchemist-server/commands/basics"
 require "alchemist-server/commands/create"
 require "alchemist-server/commands/directions"
 require "alchemist-server/commands/element"
@@ -71,7 +72,8 @@ module Alchemist
       response
     end
 
-    def self.run_append(command_string, world_file, history)
+    def self.run_append(command_string_ascii, world_file, history)
+      command_string = command_string_ascii.force_encoding Encoding::UTF_8
       event = Event.new command_string, Time.now
       response, new_world = event.happen history
 
@@ -117,6 +119,7 @@ module Alchemist
 
   COMMANDS = [
     Commands::Appear,
+    Commands::Basics,
     Commands::Create,
     Commands::North,
     Commands::South,

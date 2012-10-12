@@ -8,6 +8,7 @@ Bundler.setup
 
 require 'alchemist-server'
 require 'ffi-ncurses'
+require 'alchemist-server/curses/item_window'
 
 host = ARGV[0] || 'localhost'
 port = (ARGV[1] || 7900).to_i
@@ -24,13 +25,30 @@ module Handler
 
   INVENTORY_LABEL = 'Inventory: '
   INVENTORY_SIZE = 64
-  INVENTORY_WIDTH = INVENTORY_LABEL.length + INVENTORY_SIZE*2
+
+  BASICS_LABEL = 'Basics: '
+  BASICS_SIZE = INVENTORY_SIZE
 
   def post_init
     @lines_to_read = nil
     @border_win = newwin 22, 45, 0, 0
     @geo_win = newwin 20, 43, 1, 1
-    @inventory_win = newwin 1, INVENTORY_WIDTH, 23, 0
+
+    @inventory_win = Alchemist::ItemWindow.new(
+      INVENTORY_LABEL,
+      INVENTORY_SIZE,
+      23,
+      0
+    )
+
+    @basics_win = Alchemist::ItemWindow.new(
+      BASICS_LABEL,
+      BASICS_SIZE,
+      24,
+      0
+    )
+
+    @error_win = newwin 1, 80, 25, 0
   end
 
   def receive_line(line)
@@ -69,14 +87,30 @@ module Handler
     wclear @geo_win
     wmove @geo_win, 0, 0
     wprintw @geo_win, data.pad_to_unicode_monospace
+    move_to_avatar_position
+  end
+
+  def update_inventory(data)
+    @inventory_win.update data
+    move_to_avatar_position
+  end
+
+  def update_basics(data)
+    @basics_win.update data
+    move_to_avatar_position
+  end
+
+  def move_to_avatar_position
     wmove @geo_win, 10, 20
     wrefresh @geo_win
   end
 
-  def draw_inventory(data)
-    wclear @inventory_win
-    wprintw @inventory_win, "#{INVENTORY_LABEL}#{data.pad_to_unicode_monospace}"
-    wrefresh @inventory_win
+  def draw_error(error)
+    wmove @error_win, 0, 0
+    wprintw @error_win, "Last error: "
+    wprintw @error_win, error
+    wrefresh @error_win
+    move_to_avatar_position
   end
 
   def handle_command(command, data = nil)
@@ -84,7 +118,9 @@ module Handler
     when "hello" then login_success
     when "appeared" then appear_success
     when "see" then draw_geography data
-    when "inventory" then draw_inventory data
+    when "inventory" then update_inventory data
+    when "basics" then update_basics data
+    when "error" then draw_error data
     end
   end
 
@@ -107,6 +143,7 @@ module Handler
     draw_geo_border
     look
     request_inventory
+    request_basics
     action_loop
   end
 
@@ -118,6 +155,10 @@ module Handler
     send_data "inventory\n"
   end
 
+  def request_basics
+    send_data "basics\n"
+  end
+
   def act(char)
     case char
     when KEY_LEFT then move "west\n"
@@ -125,6 +166,8 @@ module Handler
     when KEY_UP then move "north\n"
     when KEY_DOWN then move "south\n"
     when 't'.ord then take
+    when 'p'.ord then put
+    when 'c'.ord then create
     end
   end
 
@@ -134,10 +177,22 @@ module Handler
     look
   end
 
+  def put
+    if element = @inventory_win.have_user_select
+      send_data "put #{element}\n".force_encoding(Encoding::UTF_8)
+      look
+    end
+  end
+
+  def create
+    if element = @basics_win.have_user_select
+      send_data "create #{element}\n".force_encoding(Encoding::UTF_8)
+    end
+  end
+
   def take
     send_data "take\n"
     look
-    request_inventory
   end
 
   def prompt(text)

@@ -75,7 +75,7 @@ module Alchemist
       rescue => e
         $stderr.puts "#{e.class}: #{e.message}"
         $stderr.puts e.backtrace
-        "Error: #{e}"
+        "error #{e}"
       end
 
       def send_line(data)
