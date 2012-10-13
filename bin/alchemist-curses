@@ -9,6 +9,8 @@ Bundler.setup
 require 'alchemist-server'
 require 'ffi-ncurses'
 require 'alchemist-server/curses/item_window'
+require 'alchemist-server/curses/prompt_window'
+require 'alchemist-server/curses/glyph_window'
 
 host = ARGV[0] || 'localhost'
 port = (ARGV[1] || 7900).to_i
@@ -34,21 +36,28 @@ module Handler
     @border_win = newwin 22, 45, 0, 0
     @geo_win = newwin 20, 43, 1, 1
 
-    @inventory_win = Alchemist::ItemWindow.new(
-      INVENTORY_LABEL,
-      INVENTORY_SIZE,
+    @prompt_win = Alchemist::Curses::PromptWindow.new(
       23,
-      0
+      0,
+      80
     )
 
-    @basics_win = Alchemist::ItemWindow.new(
-      BASICS_LABEL,
-      BASICS_SIZE,
+    @inventory_win = Alchemist::Curses::ItemWindow.new(
+      INVENTORY_LABEL,
+      INVENTORY_SIZE,
       24,
       0
     )
 
-    @error_win = newwin 1, 80, 25, 0
+    @basics_win = Alchemist::Curses::ItemWindow.new(
+      BASICS_LABEL,
+      BASICS_SIZE,
+      25,
+      0
+    )
+
+    @error_win = newwin 1, 80, 26, 0
+    @glyph_win = Alchemist::Curses::GlyphWindow.new 0, 46
   end
 
   def receive_line(line)
@@ -81,6 +90,11 @@ module Handler
 
     wborder @border_win,lr,lr,tb,tb,c,c,c,c
     wrefresh @border_win
+  end
+
+  def draw_glyphs
+    @glyph_win.draw
+    move_to_avatar_position
   end
 
   def draw_geography(data)
@@ -125,7 +139,7 @@ module Handler
   end
 
   def login
-    EM.defer(-> { prompt "Enter your name:" },
+    EM.defer(-> { @prompt_win.ask "Enter your name" },
              -> name do
       @name = name
       send_data name
@@ -140,6 +154,7 @@ module Handler
   end
 
   def appear_success
+    draw_glyphs
     draw_geo_border
     look
     request_inventory
@@ -168,6 +183,7 @@ module Handler
     when 't'.ord then take
     when 'p'.ord then put
     when 'c'.ord then create
+    when 'e'.ord then element
     end
   end
 
@@ -190,27 +206,17 @@ module Handler
     end
   end
 
+  def element
+    if element = @glyph_win.have_user_select
+      name = @prompt_win.ask "New Element Name"
+      send_data "element #{element} #{name}\n".force_encoding(Encoding::UTF_8)
+      request_basics
+    end
+  end
+
   def take
     send_data "take\n"
     look
-  end
-
-  def prompt(text)
-    printw text
-    printw ' '
-    answer = ''
-
-    while (c = getch) != "\n".ord
-      if c > 0
-        answer << c
-        printw (''<<c)
-      end
-    end
-
-    printw "\n"
-    refresh
-
-    answer.strip
   end
 
   def action_loop
