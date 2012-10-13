@@ -21,6 +21,7 @@ require "alchemist-server/world_history"
 
 require "alchemist-server/commands/appear"
 require "alchemist-server/commands/basics"
+require "alchemist-server/commands/compounds"
 require "alchemist-server/commands/create"
 require "alchemist-server/commands/directions"
 require "alchemist-server/commands/element"
@@ -81,7 +82,7 @@ module Alchemist
         new_history = WorldHistory.new event, history
 
         File.open(world_file,'a') do |f|
-          f.write "\n\n"
+          f.write "\n"
           f.write event.to_s
         end
       end
@@ -120,6 +121,7 @@ module Alchemist
   COMMANDS = [
     Commands::Appear,
     Commands::Basics,
+    Commands::Compounds,
     Commands::Create,
     Commands::North,
     Commands::South,

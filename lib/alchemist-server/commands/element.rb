@@ -6,8 +6,8 @@ module Alchemist
           "el(ement)?"
         end
 
-        def run(avatar_name, history, char, name)
-          world = history.world.new_element char, name
+        def run(avatar_name, history, char, *name)
+          world = history.world.new_element char, name.join(' ')
 
           return "element #{char}.", world
         end

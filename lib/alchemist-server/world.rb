@@ -24,14 +24,23 @@ module Alchemist
       update elements: elements.put(char, e)
     end
 
-    def formulate(avatar_name, elem_1, elem_2, novel_elem)
-      if formulas[novel_elem].nil?
+    def formulate(avatar_name, elem_1, elem_2, novel_elem, name)
+      if formulas[novel_elem]
+        raise "There is already a formula for #{novel_elem}"
+
+      elsif elements[novel_elem]
+        raise "#{novel_elem} is a basic element!"
+
+      else
         f = Formula.new elem_1, elem_2, novel_elem
-        w = update formulas: formulas.put(novel_elem, f)
+        e = Element.new symbol: novel_elem,
+                        name: name,
+                        basic: false
+
+        w = update formulas: formulas.put(novel_elem, f),
+                   elements: elements.put(novel_elem, e)
 
         w.forge(avatar_name, elem_1, elem_2, novel_elem)
-      else
-        raise "There is already a formula for #{novel_elem}"
       end
     end
 
@@ -143,6 +152,10 @@ module Alchemist
 
     def basic_elements
       elements.values.select(&:basic?)
+    end
+
+    def compound_elements
+      elements.values.reject(&:basic?)
     end
 
     def self.genesis
