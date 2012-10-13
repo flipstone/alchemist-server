@@ -200,6 +200,7 @@ module Handler
     when 'c'.ord then create
     when 'e'.ord then element
     when 'f'.ord then forge
+    when 'F'.ord then formulate
     end
   end
 
@@ -236,7 +237,16 @@ module Handler
        (result = @compounds_win.have_user_select)
       send_data "forge #{ingred_1} #{ingred_2} #{result}\n"
     end
+  end
 
+  def formulate
+    if (ingred_1 = @inventory_win.have_user_select) &&
+       (ingred_2 = @inventory_win.have_user_select) &&
+       (result = @glyph_win.have_user_select)
+      name = @prompt_win.ask "Compound Name"
+      send_data "formulate #{ingred_1} #{ingred_2} #{result} #{name}\n"
+      request_compounds
+    end
   end
 
   def take
