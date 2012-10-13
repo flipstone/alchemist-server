@@ -47,6 +47,7 @@ module Alchemist
       end
 
       def have_user_select
+        draw
         wmove @win, 0, 0
         wrefresh @win
 
@@ -78,6 +79,9 @@ module Alchemist
         end
 
         characters[@cursor_offset]
+      ensure
+        wclear @win
+        wrefresh @win
       end
 
       def self.chars

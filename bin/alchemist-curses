@@ -92,11 +92,6 @@ module Handler
     wrefresh @border_win
   end
 
-  def draw_glyphs
-    @glyph_win.draw
-    move_to_avatar_position
-  end
-
   def draw_geography(data)
     wclear @geo_win
     wmove @geo_win, 0, 0
@@ -154,7 +149,6 @@ module Handler
   end
 
   def appear_success
-    draw_glyphs
     draw_geo_border
     look
     request_inventory
