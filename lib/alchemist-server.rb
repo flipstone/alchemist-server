@@ -82,8 +82,8 @@ module Alchemist
         new_history = WorldHistory.new event, history
 
         File.open(world_file,'a') do |f|
-          f.write "\n"
           f.write event.to_s
+          f.write "\n"
         end
       end
 
