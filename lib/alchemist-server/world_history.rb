@@ -1,12 +1,12 @@
 module Alchemist
   class WorldHistory
+    attr_reader :world
+
     def initialize(event, prior_history)
       @event = event
       @prior_history = prior_history
-    end
 
-    def world
-      @world ||=
+      @world =
         if @prior_history.nil?
           World.genesis
         else

@@ -15,7 +15,9 @@ module Alchemist
                      inventory: "",
                      messages: Hamster.hash
 
-      update avatars: avatars | [a]
+      if !avatars.include? a
+        update avatars: avatars | [a]
+      end
     end
 
     def new_element(char, name)
