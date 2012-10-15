@@ -1,13 +1,13 @@
 module Alchemist
   module Commands
-    module Location
+    module Lock
       class <<self
         def pattern
-          "location"
+          "lock"
         end
 
         def run(avatar_name, history)
-          "location #{history.world.location(avatar_name).to_s}"
+          return "locked", history.world.lock
         end
       end
     end

@@ -29,6 +29,7 @@ require "alchemist-server/commands/forge"
 require "alchemist-server/commands/formulate"
 require "alchemist-server/commands/inventory"
 require "alchemist-server/commands/location"
+require "alchemist-server/commands/lock"
 require "alchemist-server/commands/look"
 require "alchemist-server/commands/message"
 require "alchemist-server/commands/put"
@@ -132,6 +133,7 @@ module Alchemist
     Commands::Forge,
     Commands::Formulate,
     Commands::Location,
+    Commands::Lock,
     Commands::Look,
     Commands::Message,
     Commands::Put,

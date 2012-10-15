@@ -2,7 +2,11 @@ module Alchemist
   class World
     include Record
     LOOK_RANGE = 10
-    record_attr :avatars, :formulas, :geography, :elements
+    record_attr :avatars,
+                :formulas,
+                :geography,
+                :elements,
+                :locked
 
     def to_s
       (avatars.to_a.map(&:to_s) + [geography]).join("\n")
@@ -20,7 +24,15 @@ module Alchemist
       end
     end
 
+    def lock
+      raise "The world is already locked" if locked
+      update locked: true
+    end
+
+    LOCKED_MESSAGE = "New basic elements can no longer be created. Try creating a compound instead"
     def new_element(char, name)
+      raise LOCKED_MESSAGE if locked
+
       e = Element.new symbol: char, name: name, basic: true
 
       update elements: elements.put(char, e)
