@@ -1,15 +1,12 @@
 module Alchemist
   module Commands
-    module Location
-      class <<self
-        def pattern
-          "location"
-        end
+    class Location < Base
+      pattern "location"
 
-        def run(avatar_name, history)
-          "location #{history.world.location(avatar_name).to_s}"
-        end
+      def run
+        "location #{history.world.location(avatar_name).to_s}"
       end
     end
   end
 end
+

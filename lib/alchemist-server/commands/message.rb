@@ -1,18 +1,14 @@
 module Alchemist
   module Commands
-    module Message
-      class <<self
-        def pattern
-          "message|msg"
-        end
+    class Message < Base
+      pattern "message|msg"
 
-        def run(avatar_name, history, key, *words)
-          world = history.world.put_message avatar_name,
-                                            key,
-                                            words.join(' ')
+      def run(key, *words)
+        world = history.world.put_message avatar_name,
+                                          key,
+                                          words.join(' ')
 
-          return "posted", world
-        end
+        return "posted", world
       end
     end
   end

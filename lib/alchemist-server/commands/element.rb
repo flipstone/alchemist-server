@@ -1,17 +1,14 @@
 module Alchemist
   module Commands
-    module Element
-      class <<self
-        def pattern
-          "el(ement)?"
-        end
+    class Element < Base
+      pattern "el(ement)?"
 
-        def run(avatar_name, history, char, *name)
-          world = history.world.new_element char, name.join(' ')
+      def run(char, *name)
+        world = history.world.new_element char, name.join(' ')
 
-          return "element #{char}.", world
-        end
+        return "element #{char}.", world
       end
     end
   end
 end
+

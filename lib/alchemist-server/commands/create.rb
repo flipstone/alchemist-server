@@ -1,19 +1,16 @@
 module Alchemist
   module Commands
-    module Create
-      class <<self
-        def pattern
-          "create"
-        end
+    class Create < Base
+      pattern "create"
 
-        def run(avatar_name, history, resource)
-          world = history.world.create avatar_name, resource
-          a = world.avatar avatar_name
+      def run(resource)
+        world = history.world.create avatar_name, resource
+        a = world.avatar avatar_name
 
-          return "inventory #{a.try :inventory}",
-                 world
-        end
+        return "inventory #{a.try :inventory}",
+               world
       end
     end
   end
 end
+

@@ -1,15 +1,12 @@
 module Alchemist
   module Commands
-    module Lock
-      class <<self
-        def pattern
-          "lock"
-        end
+    class Lock < Base
+      pattern "lock"
 
-        def run(avatar_name, history)
-          return "locked", history.world.lock
-        end
+      def run
+        return "locked", history.world.lock
       end
     end
   end
 end
+

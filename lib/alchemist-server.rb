@@ -19,6 +19,8 @@ require "alchemist-server/unicode_monospace"
 require "alchemist-server/world"
 require "alchemist-server/world_history"
 
+require "alchemist-server/commands/base"
+
 require "alchemist-server/commands/appear"
 require "alchemist-server/commands/basics"
 require "alchemist-server/commands/compounds"
