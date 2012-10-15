@@ -14,6 +14,7 @@ require "alchemist-server/element"
 require "alchemist-server/event"
 require "alchemist-server/formula"
 require "alchemist-server/geography"
+require "alchemist-server/outcome"
 require "alchemist-server/server_handler"
 require "alchemist-server/unicode_monospace"
 require "alchemist-server/world"
@@ -72,16 +73,16 @@ module Alchemist
 
     def self.run_command_module(command_string, world_file)
       history = load_history world_file
-      response, _ = run_append command_string, world_file, history
-      response
+      outcome = run_append command_string, world_file, history
+      outcome.try :response
     end
 
     def self.run_append(command_string_ascii, world_file, history)
       command_string = command_string_ascii.force_encoding Encoding::UTF_8
       event = Event.new command_string, Time.now
-      response, new_world = event.happen history
+      outcome = event.happen history
 
-      if new_world
+      if outcome.try :new_world
         new_history = WorldHistory.new event, history
 
         File.open(world_file,'a') do |f|
@@ -90,7 +91,7 @@ module Alchemist
         end
       end
 
-      return response, new_history
+      outcome.update new_history: new_history
     end
 
     def self.run_special_command(world_file, command_string, *args)

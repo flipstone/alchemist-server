@@ -10,8 +10,8 @@ module Alchemist
         if @prior_history.nil?
           World.genesis
         else
-          _, world = @event.happen @prior_history
-          world || @prior_history.world
+          outcome = @event.happen @prior_history
+          outcome.try(:new_world) || @prior_history.world
         end
     end
 

@@ -10,8 +10,8 @@ module Alchemist
                                     novel_elem
         a = world.avatar avatar_name
 
-        return "inventory #{a.inventory}",
-               world
+        outcome "inventory #{a.inventory}",
+                world
       end
     end
   end

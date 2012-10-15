@@ -4,8 +4,7 @@ module Alchemist
       pattern "app(ear)?"
 
       def run
-        return "appeared",
-               history.world.new_avatar(avatar_name)
+        outcome "appeared", history.world.new_avatar(avatar_name)
       end
     end
   end

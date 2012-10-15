@@ -11,8 +11,8 @@ module Alchemist
                                         name.join(' ')
         a = world.avatar avatar_name
 
-        return "inventory #{a.inventory}",
-               world
+        outcome "inventory #{a.inventory}",
+                world
       end
     end
   end

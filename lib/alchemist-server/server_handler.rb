@@ -56,12 +56,12 @@ module Alchemist
       def process_line(line)
         if @name
           command = "#{@name} #{line.chomp}"
-          res, new_h = Alchemist::Server.run_append command,
-                                                    world_file,
-                                                    history
+          outcome = Alchemist::Server.run_append command,
+                                                 world_file,
+                                                 history
 
-          self.history = new_h if new_h
-          res
+          self.history = outcome.new_history if outcome.new_history
+          outcome.response
         else
           possible_name = line.strip.split(' ').first
 

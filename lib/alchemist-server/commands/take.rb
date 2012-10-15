@@ -7,8 +7,8 @@ module Alchemist
         world = history.world.take(avatar_name)
         a = world.avatar avatar_name
 
-        return "inventory #{a.inventory}",
-               world
+        outcome "inventory #{a.inventory}",
+                world
       end
     end
   end

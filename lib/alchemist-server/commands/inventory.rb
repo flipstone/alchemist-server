@@ -4,7 +4,7 @@ module Alchemist
       pattern "inv(entory)?"
 
       def run
-        "inventory #{history.world.avatar(avatar_name).inventory}"
+        outcome "inventory #{history.world.avatar(avatar_name).inventory}"
       end
     end
   end

@@ -4,8 +4,8 @@ module Alchemist
       def run
         world = history.world.move avatar_name, direction
 
-        return "location #{world.location(avatar_name)}",
-               world
+        outcome "location #{world.location(avatar_name)}",
+                world
       end
     end
 

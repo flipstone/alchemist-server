@@ -4,7 +4,7 @@ module Alchemist
       pattern "location"
 
       def run
-        "location #{history.world.location(avatar_name).to_s}"
+        outcome "location #{history.world.location(avatar_name).to_s}"
       end
     end
   end

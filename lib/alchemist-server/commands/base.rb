@@ -16,6 +16,11 @@ module Alchemist
         @history = history
       end
 
+      def outcome(response = nil, new_world = nil)
+        Outcome.new response: response,
+                    new_world: new_world
+      end
+
       def self.run(avatar_name, history, *args)
         new(avatar_name, history).run *args
       end

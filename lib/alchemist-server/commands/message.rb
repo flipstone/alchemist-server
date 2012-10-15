@@ -8,7 +8,7 @@ module Alchemist
                                           key,
                                           words.join(' ')
 
-        return "posted", world
+        outcome "posted", world
       end
     end
   end

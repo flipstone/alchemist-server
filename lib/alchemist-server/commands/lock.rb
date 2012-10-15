@@ -4,7 +4,7 @@ module Alchemist
       pattern "lock"
 
       def run
-        return "locked", history.world.lock
+        outcome "locked", history.world.lock
       end
     end
   end

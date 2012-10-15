@@ -5,7 +5,7 @@ module Alchemist
 
       def run
         elements = history.world.compound_elements
-        "compounds #{elements.map(&:symbol).join('')}"
+        outcome "compounds #{elements.map(&:symbol).join('')}"
       end
     end
   end
