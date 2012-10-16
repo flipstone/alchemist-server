@@ -6,7 +6,9 @@ module Alchemist
       def run(char, *name)
         world = history.world.new_element char, name.join(' ')
 
-        outcome "element #{char}.", world
+        outcome "element #{char}.",
+                world,
+                Commands::Basics
       end
     end
   end

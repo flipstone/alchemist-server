@@ -4,7 +4,9 @@ module Alchemist
       pattern "app(ear)?"
 
       def run
-        outcome "appeared", history.world.new_avatar(avatar_name)
+        outcome "appeared",
+                history.world.new_avatar(avatar_name),
+                Commands::Who
       end
     end
   end
