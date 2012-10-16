@@ -25,10 +25,13 @@ module Alchemist
     end
 
     def nearby_avatar_names(name)
-      a = avatar name
+      nearby_avatars(avatar(name)).map &:name
+    end
+
+    def nearby_avatars(a)
       avatars.select do |avatar|
         avatar.near? a.location, LOOK_RANGE
-      end.map(&:name)
+      end
     end
 
     def lock
@@ -155,7 +158,7 @@ module Alchemist
 
     def messages_for(avatar_name)
       a = avatar(avatar_name)
-      messengers = avatars.select { |m| m.location == a.location }
+      messengers = nearby_avatars a
 
       messengers.sort_by(&:name).map do |m|
         { m.name => m.message_list }

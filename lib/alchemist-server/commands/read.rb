@@ -10,7 +10,7 @@ module Alchemist
           ["#{name}:"] + messages + ['']
         end
 
-        outcome(([ "messages #{lines.length}" ] + lines).join("\n"))
+        outcome((["messages #{lines.length}"] + lines + ['']).join("\n"))
       end
     end
   end

@@ -11,6 +11,7 @@ require 'ffi-ncurses'
 require 'alchemist-server/curses/item_window'
 require 'alchemist-server/curses/prompt_window'
 require 'alchemist-server/curses/glyph_window'
+require 'alchemist-server/curses/messages_window'
 
 host = ARGV[0] || 'localhost'
 port = (ARGV[1] || 7900).to_i
@@ -68,6 +69,10 @@ module Handler
 
     @error_win = newwin 1, 80, 27, 0
     @glyph_win = Alchemist::Curses::GlyphWindow.new 0, 46
+
+    @messages_win = Alchemist::Curses::MessagesWindow.new(
+      10, 80, 28, 0
+    )
   end
 
   def receive_line(line)
@@ -124,6 +129,11 @@ module Handler
     move_to_avatar_position
   end
 
+  def update_messages(data)
+    @messages_win.update data.split("\n")
+    move_to_avatar_position
+  end
+
   def move_to_avatar_position
     wmove @geo_win, 10, 20
     wrefresh @geo_win
@@ -146,6 +156,7 @@ module Handler
     when "basics" then update_basics data
     when "compounds" then update_compounds data
     when "error" then draw_error data
+    when "messages" then update_messages data
     end
   end
 
@@ -170,11 +181,16 @@ module Handler
     request_inventory
     request_basics
     request_compounds
+    read
     action_loop
   end
 
   def look
     send_data "look\n"
+  end
+
+  def read
+    send_data "read\n"
   end
 
   def request_inventory
@@ -201,6 +217,8 @@ module Handler
     when 'e'.ord then element
     when 'f'.ord then forge
     when 'F'.ord then formulate
+    when 'm'.ord then post_message
+    when 'r'.ord then read
     end
   end
 
@@ -246,6 +264,13 @@ module Handler
       name = @prompt_win.ask "Compound Name"
       send_data "formulate #{ingred_1} #{ingred_2} #{result} #{name}\n"
       request_compounds
+    end
+  end
+
+  def post_message
+    if message = @prompt_win.ask("Message (# msg)")
+      send_data "message #{message}\n"
+      read
     end
   end
 
