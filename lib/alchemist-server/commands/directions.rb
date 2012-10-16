@@ -3,9 +3,11 @@ module Alchemist
     class DirectionCommand < Base
       def run
         world = history.world.move avatar_name, direction
+        x, y = world.location avatar_name
 
-        outcome "location #{world.location(avatar_name)}",
-                world
+        outcome "location #{x} #{y}",
+                world,
+                Commands::Who
       end
     end
 

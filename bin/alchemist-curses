@@ -12,6 +12,7 @@ require 'alchemist-server/curses/item_window'
 require 'alchemist-server/curses/prompt_window'
 require 'alchemist-server/curses/glyph_window'
 require 'alchemist-server/curses/messages_window'
+require 'alchemist-server/curses/geography_window'
 
 host = ARGV[0] || 'localhost'
 port = (ARGV[1] || 7900).to_i
@@ -35,43 +36,48 @@ module Handler
   COMPOUNDS_LABEL = 'Compounds: '
   COMPOUNDS_SIZE = INVENTORY_SIZE
 
+  AVATAR_COLOR_NUM = 1
+
   def post_init
+    start_color
+    init_pair AVATAR_COLOR_NUM, Color::BLACK, Color::GREEN
+
     @lines_to_read = nil
     @border_win = newwin 22, 45, 0, 0
-    @geo_win = newwin 20, 43, 1, 1
+    @geo_win = Alchemist::Curses::GeographyWindow.new(
+      1, 1, AVATAR_COLOR_NUM)
+
+    @location_win = newwin 1, 45, 23, 0
 
     @prompt_win = Alchemist::Curses::PromptWindow.new(
-      23,
-      0,
-      80
-    )
+      24, 0, 80)
 
     @inventory_win = Alchemist::Curses::ItemWindow.new(
       INVENTORY_LABEL,
       INVENTORY_SIZE,
-      24,
+      25,
       0
     )
 
     @basics_win = Alchemist::Curses::ItemWindow.new(
       BASICS_LABEL,
       BASICS_SIZE,
-      25,
+      26,
       0
     )
 
     @compounds_win = Alchemist::Curses::ItemWindow.new(
       COMPOUNDS_LABEL,
       COMPOUNDS_SIZE,
-      26,
+      27,
       0
     )
 
-    @error_win = newwin 1, 80, 27, 0
+    @error_win = newwin 1, 80, 28, 0
     @glyph_win = Alchemist::Curses::GlyphWindow.new 0, 46
 
     @messages_win = Alchemist::Curses::MessagesWindow.new(
-      10, 80, 28, 0
+      10, 80, 29, 0
     )
   end
 
@@ -107,11 +113,24 @@ module Handler
     wrefresh @border_win
   end
 
-  def draw_geography(data)
-    wclear @geo_win
-    wmove @geo_win, 0, 0
-    wprintw @geo_win, data.pad_to_unicode_monospace
-    move_to_avatar_position
+  def update_geography(data)
+    if @location
+      @geo_win.update @location, data
+    end
+  end
+
+  def update_location(data)
+    x, y = data.split(/\s+/).map &:to_i
+    @location = [x, y]
+    draw_location *@location
+    @geo_win.update_avatar @name, *@location
+  end
+
+  def draw_location(x, y)
+    wclear @location_win
+    wmove @location_win, 0, 0
+    wprintw @location_win, "Location: #{x},#{y}"
+    wrefresh @location_win
   end
 
   def update_inventory(data)
@@ -135,8 +154,7 @@ module Handler
   end
 
   def move_to_avatar_position
-    wmove @geo_win, 10, 20
-    wrefresh @geo_win
+    @geo_win.move_to_avatar_position
   end
 
   def draw_error(error)
@@ -151,13 +169,20 @@ module Handler
     case command
     when "hello" then login_success
     when "appeared" then appear_success
-    when "see" then draw_geography data
+    when "see" then update_geography data
     when "inventory" then update_inventory data
     when "basics" then update_basics data
     when "compounds" then update_compounds data
     when "error" then draw_error data
     when "messages" then update_messages data
+    when "avatar" then update_avatar data
+    when "location" then update_location data
     end
+  end
+
+  def update_avatar(data)
+    name, x, y = data.split /\s+/
+    @geo_win.update_avatar name, x.to_i, y.to_i
   end
 
   def login
@@ -177,12 +202,18 @@ module Handler
 
   def appear_success
     draw_geo_border
+    who
+    request_location
     look
     request_inventory
     request_basics
     request_compounds
     read
     action_loop
+  end
+
+  def request_location
+    send_data "location\n"
   end
 
   def look
@@ -203,6 +234,10 @@ module Handler
 
   def request_compounds
     send_data "compounds\n"
+  end
+
+  def who
+    send_data "who\n"
   end
 
   def act(char)

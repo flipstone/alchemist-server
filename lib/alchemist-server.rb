@@ -38,6 +38,7 @@ require "alchemist-server/commands/message"
 require "alchemist-server/commands/put"
 require "alchemist-server/commands/read"
 require "alchemist-server/commands/take"
+require "alchemist-server/commands/who"
 
 class Object
   def try(sym, *args)
@@ -142,6 +143,7 @@ module Alchemist
     Commands::Put,
     Commands::Read,
     Commands::Take,
+    Commands::Who,
   ]
 end
 
