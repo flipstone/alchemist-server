@@ -93,7 +93,7 @@ module Alchemist
         [
           (loc.x - x).abs,
           (loc.y - y).abs
-        ].min
+        ].max
       end
 
       def ==(other)
