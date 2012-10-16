@@ -16,9 +16,10 @@ module Alchemist
         @history = history
       end
 
-      def outcome(response = nil, new_world = nil)
+      def outcome(response = nil, new_world = nil, command = nil)
         Outcome.new response: response,
-                    new_world: new_world
+                    new_world: new_world,
+                    nearby_avatar_command: command
       end
 
       def self.run(avatar_name, history, *args)

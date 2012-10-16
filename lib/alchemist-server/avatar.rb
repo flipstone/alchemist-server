@@ -15,6 +15,10 @@ module Alchemist
       Geography::Loc.new x, y
     end
 
+    def near?(location, range)
+      location.distance(self.location) <= range
+    end
+
     def add_to_inventory(additions)
       a = update inventory: (inventory + additions).gsub(' ','')
 

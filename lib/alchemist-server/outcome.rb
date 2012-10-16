@@ -5,7 +5,8 @@ module Alchemist
 
     record_attr :response,
                 :new_world,
-                :new_history
+                :new_history,
+                :nearby_avatar_command
   end
 end
 

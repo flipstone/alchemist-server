@@ -8,7 +8,8 @@ module Alchemist
         a = world.avatar avatar_name
 
         outcome "inventory #{a.inventory}",
-                world
+                world,
+                Commands::Look
       end
     end
   end

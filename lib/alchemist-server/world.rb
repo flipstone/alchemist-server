@@ -24,6 +24,13 @@ module Alchemist
       end
     end
 
+    def nearby_avatar_names(name)
+      a = avatar name
+      avatars.select do |avatar|
+        avatar.near? a.location, LOOK_RANGE
+      end.map(&:name)
+    end
+
     def lock
       raise "The world is already locked" if locked
       update locked: true

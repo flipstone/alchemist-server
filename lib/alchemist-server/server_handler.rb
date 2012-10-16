@@ -9,10 +9,12 @@ module Alchemist
 
         @world_file = world_file
         @history = history
+        @connections = []
 
         class <<self
           attr_reader :world_file
           attr_accessor :history
+          attr_accessor :connections
         end
 
         def self.included(mod)
@@ -31,14 +33,25 @@ module Alchemist
         def history=(h)
           self.class.state.history = h
         end
+
+        def connections
+          self.class.state.connections
+        end
       end
     end
 
     module Methods
       include EventMachine::Protocols::LineProtocol
 
+      attr_reader :name
+
       def post_init
+        connections << self
         send_line "Welcome, alchemical friend. What is your name?"
+      end
+
+      def unbind
+        connections.delete self
       end
 
       def receive_line(line)
@@ -54,28 +67,59 @@ module Alchemist
       end
 
       def process_line(line)
-        if @name
-          command = "#{@name} #{line.chomp}"
+        if name
+          command = "#{name} #{line.chomp}"
           outcome = Alchemist::Server.run_append command,
                                                  world_file,
                                                  history
 
           self.history = outcome.new_history if outcome.new_history
+
+          if command = outcome.nearby_avatar_command
+            run_command_nearby command
+          end
+
           outcome.response
         else
           possible_name = line.strip.split(' ').first
 
           if possible_name && possible_name.length > 0
             @name = possible_name
-            "hello #{@name}"
+            "hello #{name}"
           else
             "Please tell me your name."
           end
         end
       rescue => e
+        show_error e
+        "error #{e}"
+      end
+
+      def run_command_nearby(command)
+        nearby = history.world.nearby_avatar_names name
+
+        connections.select do |c|
+          begin
+            if nearby.include? c.name
+              c.run_unrecorded_command command
+            end
+          rescue => e
+            show_error e
+          end
+        end
+      end
+
+      def show_error(e)
         $stderr.puts "#{e.class}: #{e.message}"
         $stderr.puts e.backtrace
-        "error #{e}"
+      end
+
+      def run_unrecorded_command(command)
+        outcome = command.run name, history
+
+        if r = outcome.response
+          send_line r
+        end
       end
 
       def send_line(data)

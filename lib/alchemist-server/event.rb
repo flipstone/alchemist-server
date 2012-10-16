@@ -12,6 +12,8 @@ module Alchemist
 
       if command_mod = COMMANDS.detect { |c| match_command? command, c }
         command_mod.run avatar_name, history, *args
+      else
+        Outcome.new response: "error Unknown Command: #{command}"
       end
     end
 

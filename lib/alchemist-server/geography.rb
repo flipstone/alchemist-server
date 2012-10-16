@@ -89,6 +89,13 @@ module Alchemist
         min.y <= y && y <= max.y
       end
 
+      def distance(loc)
+        [
+          (loc.x - x).abs,
+          (loc.y - y).abs
+        ].min
+      end
+
       def ==(other)
         other.class == self.class &&
         other.x == x &&
