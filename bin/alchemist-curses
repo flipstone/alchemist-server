@@ -191,10 +191,10 @@ module Handler
 
   def act(char)
     case char
-    when KEY_LEFT then move "west\n"
-    when KEY_RIGHT then move "east\n"
-    when KEY_UP then move "north\n"
-    when KEY_DOWN then move "south\n"
+    when KEY_LEFT then move "west"
+    when KEY_RIGHT then move "east"
+    when KEY_UP then move "north"
+    when KEY_DOWN then move "south"
     when 't'.ord then take
     when 'p'.ord then put
     when 'c'.ord then create
