@@ -39,9 +39,16 @@ module Alchemist
       update locked: true
     end
 
+    def validate_element_symbol!(symbol)
+      if !Glyphs.strings.include? symbol
+        raise "#{symbol} is not a valid element symbol"
+      end
+    end
+
     LOCKED_MESSAGE = "New basic elements can no longer be created. Try creating a compound instead"
     def new_element(char, name)
       raise LOCKED_MESSAGE if locked
+      validate_element_symbol! char
 
       e = Element.new symbol: char, name: name, basic: true
 
@@ -49,6 +56,8 @@ module Alchemist
     end
 
     def formulate(avatar_name, elem_1, elem_2, novel_elem, name)
+      validate_element_symbol! novel_elem
+
       if formulas[novel_elem]
         raise "There is already a formula for #{novel_elem}"
 
