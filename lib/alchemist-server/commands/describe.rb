@@ -7,7 +7,7 @@ module Alchemist
         element = history.world.element symbol
 
         if element
-          outcome "element #{element.symbol} #{element.name}"
+          outcome "element #{element.symbol} #{element.name} #{element.hex_code}"
         else
           outcome "noelement #{symbol}"
         end
