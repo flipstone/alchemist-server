@@ -8,7 +8,7 @@ module Alchemist
                                           key,
                                           words.join(' ')
 
-        outcome "posted", world, Commands::Read
+        outcome nil, world, Commands::Read
       end
     end
   end

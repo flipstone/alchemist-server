@@ -13,6 +13,7 @@ require 'alchemist-server/curses/prompt_window'
 require 'alchemist-server/curses/glyph_window'
 require 'alchemist-server/curses/messages_window'
 require 'alchemist-server/curses/geography_window'
+require 'alchemist-server/event_machine/client_protocol'
 
 host = ARGV[0] || 'localhost'
 port = (ARGV[1] || 7900).to_i
@@ -25,7 +26,7 @@ end
 
 module Handler
   include FFI::NCurses
-  include EventMachine::Protocols::LineProtocol
+  include Alchemist::EventMachine::ClientProtocol
 
   INVENTORY_LABEL = 'Inventory: '
   INVENTORY_SIZE = 64
@@ -42,7 +43,6 @@ module Handler
     start_color
     init_pair AVATAR_COLOR_NUM, Color::BLACK, Color::GREEN
 
-    @lines_to_read = nil
     @border_win = newwin 22, 45, 0, 0
     @geo_win = Alchemist::Curses::GeographyWindow.new(
       1, 1, AVATAR_COLOR_NUM)
@@ -81,29 +81,6 @@ module Handler
     )
   end
 
-  def receive_line(line)
-    if @lines_to_read
-      @response << line
-      @lines_to_read -= 1
-
-      if @lines_to_read <= 0
-        @lines_to_read = nil
-        handle_command @command, @response
-        @command = nil
-        @response = nil
-      end
-    end
-    if line =~ /^Welcome, alchemical friend/
-      login
-    elsif line =~ /^(see|messages|avatars) (\d+)$/
-      @command = $1
-      @lines_to_read = $2.to_i
-      @response = ''
-    else
-      handle_command *line.split(' ',2)
-    end
-  end
-
   def draw_geo_border
     lr = '|'.ord
     tb = '-'.ord
@@ -113,13 +90,13 @@ module Handler
     wrefresh @border_win
   end
 
-  def update_geography(data)
+  def handle_see(data)
     if @location
       @geo_win.update @location, data
     end
   end
 
-  def update_location(data)
+  def handle_location(data)
     x, y = data.split(/\s+/).map &:to_i
     @location = [x, y]
     draw_location *@location
@@ -133,22 +110,22 @@ module Handler
     wrefresh @location_win
   end
 
-  def update_inventory(data)
+  def handle_inventory(data)
     @inventory_win.update data
     move_to_avatar_position
   end
 
-  def update_basics(data)
+  def handle_basics(data)
     @basics_win.update data
     move_to_avatar_position
   end
 
-  def update_compounds(data)
+  def handle_compounds(data)
     @compounds_win.update data
     move_to_avatar_position
   end
 
-  def update_messages(data)
+  def handle_messages(data)
     @messages_win.update data.split("\n")
     move_to_avatar_position
   end
@@ -157,7 +134,7 @@ module Handler
     @geo_win.move_to_avatar_position
   end
 
-  def draw_error(error)
+  def handle_error(error)
     wmove @error_win, 0, 0
     wprintw @error_win, "Last error: "
     wprintw @error_win, error
@@ -165,22 +142,7 @@ module Handler
     move_to_avatar_position
   end
 
-  def handle_command(command, data = nil)
-    case command
-    when "hello" then login_success
-    when "appeared" then appear_success
-    when "see" then update_geography data
-    when "inventory" then update_inventory data
-    when "basics" then update_basics data
-    when "compounds" then update_compounds data
-    when "error" then draw_error data
-    when "messages" then update_messages data
-    when "avatars" then update_avatars data
-    when "location" then update_location data
-    end
-  end
-
-  def update_avatars(data)
+  def handle_avatars(data)
     locations = data.each_line.map do |line|
       name, x, y = line.split /\s+/
       { name => [x.to_i,y.to_i] }
@@ -189,22 +151,21 @@ module Handler
     @geo_win.update_avatars locations.reduce :merge
   end
 
-  def login
+  def handle_welcome
     EM.defer(-> { @prompt_win.ask "Enter your name" },
              -> name do
       @name = name
-      send_data name
-      send_data "\n"
+      login name
     end)
   end
 
-  def login_success
+  def handle_hello
     printw "Appearing...\n"
     refresh
-    send_data "appear\n"
+    appear
   end
 
-  def appear_success
+  def handle_appeared
     draw_geo_border
     who
     request_location
@@ -216,105 +177,77 @@ module Handler
     action_loop
   end
 
-  def request_location
-    send_data "location\n"
-  end
-
-  def look
-    send_data "look\n"
-  end
-
-  def read
-    send_data "read\n"
-  end
-
-  def request_inventory
-    send_data "inventory\n"
-  end
-
-  def request_basics
-    send_data "basics\n"
-  end
-
-  def request_compounds
-    send_data "compounds\n"
-  end
-
-  def who
-    send_data "who\n"
-  end
-
   def act(char)
     case char
-    when KEY_LEFT then move "west"
-    when KEY_RIGHT then move "east"
-    when KEY_UP then move "north"
-    when KEY_DOWN then move "south"
-    when 't'.ord then take
-    when 'p'.ord then put
-    when 'c'.ord then create
-    when 'e'.ord then element
-    when 'f'.ord then forge
-    when 'F'.ord then formulate
-    when 'm'.ord then post_message
-    when 'r'.ord then read
+    when KEY_LEFT then move_action "west"
+    when KEY_RIGHT then move_action "east"
+    when KEY_UP then move_action "north"
+    when KEY_DOWN then move_action "south"
+    when 't'.ord then take_action
+    when 'p'.ord then put_action
+    when 'c'.ord then create_action
+    when 'e'.ord then element_action
+    when 'f'.ord then forge_action
+    when 'F'.ord then formulate_action
+    when 'm'.ord then post_message_action
+    when 'r'.ord then read_action
     end
   end
 
-  def move(direction)
-    send_data direction
-    send_data "\n"
+  def move_action(direction)
+    move direction
     look
   end
 
-  def put
+  def put_action
     if element = @inventory_win.have_user_select
-      send_data "put #{element}\n"
+      put element
       look
     end
   end
 
-  def create
+  def create_action
     if element = @basics_win.have_user_select
-      send_data "create #{element}\n"
+      create element
     end
   end
 
-  def element
-    if element = @glyph_win.have_user_select
+  def element_action
+    if symbol = @glyph_win.have_user_select
       name = @prompt_win.ask "New Element Name"
-      send_data "element #{element} #{name}\n"
+      element symbol, name
       request_basics
     end
   end
 
-  def forge
+  def forge_action
     if (ingred_1 = @inventory_win.have_user_select) &&
        (ingred_2 = @inventory_win.have_user_select) &&
        (result = @compounds_win.have_user_select)
-      send_data "forge #{ingred_1} #{ingred_2} #{result}\n"
+      forge ingred_1, ingred_2, result
     end
   end
 
-  def formulate
+  def formulate_action
     if (ingred_1 = @inventory_win.have_user_select) &&
        (ingred_2 = @inventory_win.have_user_select) &&
        (result = @glyph_win.have_user_select)
       name = @prompt_win.ask "Compound Name"
-      send_data "formulate #{ingred_1} #{ingred_2} #{result} #{name}\n"
+      formulate ingred_1, ingred_2, result, name
       request_compounds
     end
   end
 
-  def post_message
-    if message = @prompt_win.ask("Message (# msg)")
-      send_data "message #{message}\n"
+  def post_message_action
+    if input = @prompt_win.ask("Message (# msg)")
+      num, message = input.split(' ',2)
+      message num, message
       read
     end
   end
 
-  def take
-    send_data "take\n"
+  def take_action
+    take
     look
   end
 

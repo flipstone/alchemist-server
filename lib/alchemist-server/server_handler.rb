@@ -47,7 +47,7 @@ module Alchemist
 
       def post_init
         connections << self
-        send_line "Welcome, alchemical friend. What is your name?"
+        send_line "Welcome alchemical friend. What is your name?"
       end
 
       def unbind
