@@ -45,18 +45,19 @@ basics
 ------
 returns a string that identifies the basic elements that exist in alchemist
 
-basics include:
-
-		name   unicode
-	火  fire   0x706b
-	〰  water  0x3030
-	░   earth  0x2591
-	〃  wind   0x3003
-
 example:
 
 	> basics
 	basics 火░〃〰
+	
+basics include:
+
+		name   unicode
+	火  fire   \u706b
+	〰  water  \u3030
+	░   earth  \u2591
+	〃  wind   \u3003
+
 
 compounds
 ---------
@@ -67,12 +68,49 @@ example:
 	> compounds
 	compounds ʬㄒㄘ〝
 
-create
-------
+create ABX
+----------
 allows you to create new compounds in alchemist. they are created by providing two basic characters and a currently unused unicode character that will represent the compound in alchemist
-
-
 
 example:
 
-	> create 
+	> create 火░ㄒ
+
+read
+----
+returns the messages of all nearby avatars. this command is automatically called after a successful `message` call
+
+	> read
+	messages 10
+	Alchemistasaur:
+	
+	Ryan:
+	
+	moob:
+	"pants"
+	
+	
+	
+    qxjit:
+
+message|msg N MSG
+-----------------
+
+allows you to add messages to your avatar where N is 0-9 and MSG is a string to attach to that position
+
+the server will respond as if you had called `read` immediately after
+
+example:
+
+	> message 0 "hi"
+	messages 10
+	Alchemistasaur:
+	
+	Ryan:
+	
+	moob:
+	"pants"
+	
+	
+	
+	qxjit:
