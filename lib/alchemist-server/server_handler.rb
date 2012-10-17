@@ -97,7 +97,12 @@ module Alchemist
 
       def run_command_nearby(command)
         new_nearby = history.world.nearby_avatar_names name
-        old_nearby = history.prior_world.try :nearby_avatar_names, name
+        old_nearby = begin
+                       history.prior_world.try :nearby_avatar_names, name
+                     rescue
+                       # bail out if user wasn't in prior world
+                       []
+                     end
 
         nearby = new_nearby | (old_nearby || [])
 
