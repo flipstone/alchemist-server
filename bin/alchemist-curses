@@ -13,7 +13,6 @@ require 'alchemist-server/curses/prompt_window'
 require 'alchemist-server/curses/glyph_window'
 require 'alchemist-server/curses/messages_window'
 require 'alchemist-server/curses/geography_window'
-require 'alchemist-server/event_machine/client_protocol'
 
 host = ARGV[0] || 'localhost'
 port = (ARGV[1] || 7900).to_i

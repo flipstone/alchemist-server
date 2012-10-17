@@ -41,7 +41,7 @@ module Alchemist
     end
 
     module Methods
-      include EventMachine::Protocols::LineProtocol
+      include ::EventMachine::Protocols::LineProtocol
 
       attr_reader :name
 

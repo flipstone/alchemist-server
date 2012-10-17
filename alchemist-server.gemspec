@@ -24,4 +24,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "hamster"
   s.add_runtime_dependency "eventmachine", ">= 1.0"
   s.add_runtime_dependency "ffi-ncurses", ">= 0.4.0"
+  s.add_runtime_dependency "alchemist-core", ">= 0.0.1"
 end

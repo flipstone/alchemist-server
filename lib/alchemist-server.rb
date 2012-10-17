@@ -5,6 +5,7 @@ require "eventmachine"
 require "benchmark"
 require "em/protocols/line_protocol"
 
+require "alchemist-core"
 require "alchemist-server/version"
 require "alchemist-server/record"
 
@@ -14,10 +15,8 @@ require "alchemist-server/element"
 require "alchemist-server/event"
 require "alchemist-server/formula"
 require "alchemist-server/geography"
-require "alchemist-server/glyphs"
 require "alchemist-server/outcome"
 require "alchemist-server/server_handler"
-require "alchemist-server/unicode_monospace"
 require "alchemist-server/world"
 require "alchemist-server/world_history"
 
@@ -59,7 +58,7 @@ module Alchemist
     SERVER_PORT = 79 * 100
 
     def self.run(world_file)
-      EventMachine.start_server "", SERVER_PORT, ServerHandler.new(world_file)
+      ::EventMachine.start_server "", SERVER_PORT, ServerHandler.new(world_file)
       puts "Listening on #{SERVER_PORT}"
     end
 
