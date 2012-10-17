@@ -190,7 +190,7 @@ module Handler
     when 'f'.ord then forge_action
     when 'F'.ord then formulate_action
     when 'm'.ord then post_message_action
-    when 'r'.ord then read_action
+    when 'r'.ord then read
     end
   end
 
