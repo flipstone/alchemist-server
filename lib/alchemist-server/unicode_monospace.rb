@@ -51,4 +51,3 @@ end
 String.class_eval do
   include Alchemist::UnicodeMonospace::StringExtensions
 end
-__END__
