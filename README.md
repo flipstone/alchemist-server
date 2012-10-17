@@ -75,6 +75,8 @@ allows you to create new compounds in alchemist. they are created by providing t
 example:
 
 	> create 火░ㄒ
+	
+!!! incomplete !!!
 
 read
 ----
