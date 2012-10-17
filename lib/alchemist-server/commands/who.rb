@@ -8,10 +8,10 @@ module Alchemist
         avatars = history.world.nearby_avatars a
 
         locations = avatars.map do |avatar|
-          "avatar #{avatar.name} #{avatar.x} #{avatar.y}\n"
-        end.join('')
+          "#{avatar.name} #{avatar.x} #{avatar.y}\n"
+        end
 
-        outcome locations
+        outcome (["avatars #{locations.length}\n"] + locations).join('')
       end
     end
   end

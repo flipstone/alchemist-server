@@ -48,6 +48,11 @@ module Alchemist
         draw
       end
 
+      def update_avatars(avatars)
+        @avatars = avatars.dup
+        draw
+      end
+
       def move_to_avatar_position
         wmove @win, 10, 20
         wrefresh @win

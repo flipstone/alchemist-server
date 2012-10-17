@@ -95,7 +95,7 @@ module Handler
     end
     if line =~ /^Welcome, alchemical friend/
       login
-    elsif line =~ /^(see|messages) (\d+)$/
+    elsif line =~ /^(see|messages|avatars) (\d+)$/
       @command = $1
       @lines_to_read = $2.to_i
       @response = ''
@@ -175,14 +175,18 @@ module Handler
     when "compounds" then update_compounds data
     when "error" then draw_error data
     when "messages" then update_messages data
-    when "avatar" then update_avatar data
+    when "avatars" then update_avatars data
     when "location" then update_location data
     end
   end
 
-  def update_avatar(data)
-    name, x, y = data.split /\s+/
-    @geo_win.update_avatar name, x.to_i, y.to_i
+  def update_avatars(data)
+    locations = data.each_line.map do |line|
+      name, x, y = line.split /\s+/
+      { name => [x.to_i,y.to_i] }
+    end
+
+    @geo_win.update_avatars locations.reduce :merge
   end
 
   def login

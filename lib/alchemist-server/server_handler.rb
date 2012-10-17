@@ -96,7 +96,10 @@ module Alchemist
       end
 
       def run_command_nearby(command)
-        nearby = history.world.nearby_avatar_names name
+        new_nearby = history.world.nearby_avatar_names name
+        old_nearby = history.prior_world.try :nearby_avatar_names, name
+
+        nearby = new_nearby | (old_nearby || [])
 
         connections.select do |c|
           begin

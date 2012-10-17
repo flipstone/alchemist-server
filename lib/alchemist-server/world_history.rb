@@ -11,8 +11,12 @@ module Alchemist
           World.genesis
         else
           outcome = @event.happen @prior_history
-          outcome.try(:new_world) || @prior_history.world
+          outcome.try(:new_world) || prior_world
         end
+    end
+
+    def prior_world
+      @prior_history.try :world
     end
 
     def to_s
