@@ -182,6 +182,10 @@ module Alchemist
       elements.values.reject(&:basic?)
     end
 
+    def element(symbol)
+      elements[symbol]
+    end
+
     def self.genesis
       World.new avatars: [],
                 formulas: Hamster.hash,

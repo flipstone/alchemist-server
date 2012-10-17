@@ -26,6 +26,7 @@ require "alchemist-server/commands/appear"
 require "alchemist-server/commands/basics"
 require "alchemist-server/commands/compounds"
 require "alchemist-server/commands/create"
+require "alchemist-server/commands/describe"
 require "alchemist-server/commands/directions"
 require "alchemist-server/commands/element"
 require "alchemist-server/commands/forge"
@@ -128,6 +129,7 @@ module Alchemist
     Commands::Basics,
     Commands::Compounds,
     Commands::Create,
+    Commands::Describe,
     Commands::North,
     Commands::South,
     Commands::East,

@@ -81,6 +81,10 @@ module Handler
     )
   end
 
+  def item_hover(item)
+    describe item
+  end
+
   def draw_geo_border
     lr = '|'.ord
     tb = '-'.ord
@@ -134,7 +138,19 @@ module Handler
     @geo_win.move_to_avatar_position
   end
 
+  def handle_element(message)
+    draw_error message.pad_to_unicode_monospace
+  end
+
+  def element(message)
+    draw_error message.pad_to_unicode_monospace
+  end
+
   def handle_error(error)
+    draw_error error
+  end
+
+  def draw_error(error)
     wmove @error_win, 0, 0
     wprintw @error_win, "Last error: "
     wprintw @error_win, error
@@ -191,6 +207,7 @@ module Handler
     when 'F'.ord then formulate_action
     when 'm'.ord then post_message_action
     when 'r'.ord then read
+    when 'd'.ord then describe_action
     end
   end
 
@@ -202,7 +219,12 @@ module Handler
   def put_action
     if element = @inventory_win.have_user_select
       put element
-      look
+    end
+  end
+
+  def describe_action
+    if element = @inventory_win.have_user_select
+      describe element
     end
   end
 
@@ -248,7 +270,6 @@ module Handler
 
   def take_action
     take
-    look
   end
 
   def action_loop

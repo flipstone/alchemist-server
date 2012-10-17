@@ -29,27 +29,28 @@ module Alchemist
           case c
           when KEY_LEFT
             y,x = getyx @win
-            new_x = x - 2
-            wmove @win,
-                  0,
-                  [new_x, @label.length].max
+            new_x = [x - 2, @label.length].max
+            wmove @win, 0, new_x
             wrefresh @win
 
           when KEY_RIGHT
             y,x = getyx @win
-            new_x = x + 2
-            wmove @win,
-                  0,
-                  [new_x, @width - 1].min
+            new_x = [x + 2, @width - 1].min
+            wmove @win, 0, new_x
             wrefresh @win
+
           when KEY_ESCAPE
             return nil
           end
         end
 
         y,x = getyx @win
-        inv_index = (x - @label.length) / 2
 
+        item_at x
+      end
+
+      def item_at(x)
+        inv_index = (x - @label.length) / 2
         @items[inv_index]
       end
     end

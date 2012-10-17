@@ -17,6 +17,8 @@ module Alchemist
       def handel_avatars(message);end
       def handel_location(message);end
       def handle_error(message);end
+      def handle_element(message);end
+      def handle_noelement(message);end
 
       # Clients can call these methods to send commands to the server
       #
@@ -90,6 +92,10 @@ module Alchemist
         send_data "element #{symbol} #{name}\n"
       end
 
+      def describe(symbol)
+        send_data "describe #{symbol}\n"
+      end
+
       def forge(ingred_1, ingred_2, result)
         send_data "forge #{ingred_1} #{ingred_2} #{result}\n"
       end
@@ -141,6 +147,8 @@ module Alchemist
         when "messages" then handle_messages data
         when "avatars" then handle_avatars data
         when "location" then handle_location data
+        when "element" then handle_element data
+        when "noelement" then handle_noelement data
         end
       end
     end
