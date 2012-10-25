@@ -5,11 +5,11 @@ require "alchemist-server/version"
 Gem::Specification.new do |s|
   s.name        = "alchemist-server"
   s.version     = Alchemist::Server::VERSION
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.authors     = ["David Vollbracht"]
+  s.email       = ["david@flipstone.com"]
+  s.homepage    = "https://github.com/flipstone/alchemist-server"
+  s.summary     = %q{Server process for the Alchemist game}
+  s.description = %q{}
 
   s.rubyforge_project = "alchemist-server"
 
@@ -20,9 +20,10 @@ Gem::Specification.new do |s|
 
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
+  s.add_development_dependency "ffi-ncurses", ">= 0.4.0"
+
   s.add_runtime_dependency "rb-readline"
   s.add_runtime_dependency "hamster"
   s.add_runtime_dependency "eventmachine", ">= 1.0"
-  s.add_runtime_dependency "ffi-ncurses", ">= 0.4.0"
   s.add_runtime_dependency "alchemist-core", ">= 0.0.1"
 end
