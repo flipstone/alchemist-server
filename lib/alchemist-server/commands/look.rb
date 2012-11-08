@@ -5,7 +5,7 @@ module Alchemist
 
       def run
         outcome [
-                  "see #{World::LOOK_RANGE*2}",
+                  "see #{World::LOOK_RANGE*2 + 1}",
                   history.world.look(avatar_name)
                 ].join("\n")
       end
